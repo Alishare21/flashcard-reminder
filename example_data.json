@@ -1,0 +1,44 @@
+{
+  "fixture_note": "Created from the pasted specification because the referenced example_data.json was not supplied.",
+  "config_agent": {
+    "valid": {
+      "timezone": "Asia/Kolkata",
+      "max_front_chars": 300,
+      "max_back_chars": 1000,
+      "new_cards_per_day": 20,
+      "max_reviews_per_day": 100,
+      "max_interval_days": 365
+    },
+    "missing_notes_error": "notes folder is missing"
+  },
+  "card_generator_agent": {
+    "notes": {
+      "python/basics.md": "# Python basics\n\nQ: What is Python?\nA: A programming language.\n\nimmutable :: unable to change after creation\n\nA {{c1::list}} is {{c2::mutable}} in Python.\n\nQ: Which keyword\nstarts a function?\nA: def\n",
+      "ai.md": "# AI\n\nneuron :: a basic processing unit\n\nQ: What is overfitting?\nA: Fitting noise in training data.\n\nQ: Missing answer\n"
+    },
+    "expected_cards": [
+      {"id": "93f9a30d68d4", "deck": "python/basics", "type": "qa", "front": "What is Python?", "back": "A programming language.", "source_line": 3},
+      {"id": "378c26610f53", "deck": "python/basics", "type": "term", "front": "immutable", "back": "unable to change after creation", "source_line": 6},
+      {"id": "0f4f26c95380", "deck": "python/basics", "type": "cloze", "front": "A [...] is mutable in Python.", "back": "A **list** is mutable in Python.", "source_line": 8},
+      {"id": "c71494efe3b4", "deck": "python/basics", "type": "cloze", "front": "A list is [...] in Python.", "back": "A list is **mutable** in Python.", "source_line": 8},
+      {"id": "e0904b5b9025", "deck": "python/basics", "type": "qa", "front": "Which keyword\nstarts a function?", "back": "def", "source_line": 10},
+      {"id": "0e0ef9f5c3e7", "deck": "ai", "type": "term", "front": "neuron", "back": "a basic processing unit", "source_line": 3},
+      {"id": "233cc1acf0c9", "deck": "ai", "type": "qa", "front": "What is overfitting?", "back": "Fitting noise in training data.", "source_line": 5}
+    ],
+    "warnings": ["ai.md:8: missing answer"]
+  },
+  "scheduler_agent": [
+    {"before": {"ease": 2.5, "interval_days": 0, "repetitions": 0}, "grade": 3, "review_date": "2026-01-01", "after": {"ease": 2.5, "interval_days": 1, "repetitions": 1, "due_date": "2026-01-02"}},
+    {"before": {"ease": 2.5, "interval_days": 1, "repetitions": 1}, "grade": 3, "review_date": "2026-01-02", "after": {"ease": 2.5, "interval_days": 6, "repetitions": 2, "due_date": "2026-01-08"}},
+    {"before": {"ease": 2.5, "interval_days": 6, "repetitions": 2}, "grade": 3, "review_date": "2026-01-08", "after": {"ease": 2.5, "interval_days": 15, "repetitions": 3, "due_date": "2026-01-23"}},
+    {"before": {"ease": 2.5, "interval_days": 15, "repetitions": 3}, "grade": 4, "review_date": "2026-01-23", "after": {"ease": 2.6, "interval_days": 38, "repetitions": 4, "due_date": "2026-03-02"}},
+    {"before": {"ease": 2.5, "interval_days": 0, "repetitions": 0}, "grade": 2, "review_date": "2026-01-01", "after": {"ease": 2.36, "interval_days": 1, "repetitions": 1, "due_date": "2026-01-02"}},
+    {"before": {"ease": 2.6, "interval_days": 38, "repetitions": 4}, "grade": 1, "review_date": "2026-03-02", "after": {"ease": 2.6, "interval_days": 1, "repetitions": 0, "due_date": "2026-03-03"}},
+    {"before": {"ease": 2.5, "interval_days": 200, "repetitions": 2}, "grade": 3, "review_date": "2026-01-01", "after": {"ease": 2.5, "interval_days": 365, "repetitions": 3, "due_date": "2027-01-01"}}
+  ],
+  "reminder_agent": {
+    "today": "2026-01-01",
+    "subject": "Flashcards due today: 3 cards (2 new, 1 review)",
+    "body": "Date: 2026-01-01\nDue by deck:\n- python/basics: 2\n- ai: 1\nOldest overdue: 1 day\nStart reviewing: python src/main.py review"
+  }
+}

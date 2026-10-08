@@ -1,0 +1,20 @@
+{
+  "name": "flashcard-reminder-trigger",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "trigger:dev": "trigger dev",
+    "trigger:deploy": "trigger deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@trigger.dev/python": "4.7.3",
+    "@trigger.dev/sdk": "4.7.3"
+  },
+  "devDependencies": {
+    "@trigger.dev/build": "4.7.3",
+    "trigger.dev": "4.7.3",
+    "typescript": "5.8.3"
+  }
+}

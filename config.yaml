@@ -1,0 +1,19 @@
+notes_dir: notes
+database_path: data/cards.db
+timezone: Asia/Kolkata
+parsing:
+  max_front_chars: 300
+  max_back_chars: 1000
+  heading_mode: false
+scheduling:
+  new_cards_per_day: 20
+  max_reviews_per_day: 100
+  max_interval_days: 365
+reminder:
+  smtp_host: smtp.gmail.com
+  smtp_port: 587
+  from_email: ""
+  to_email: ""
+  send_when_empty: false
+  show_card_preview: false
+

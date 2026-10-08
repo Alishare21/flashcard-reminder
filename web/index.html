@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111827">
+    <title>Recall — Flashcard Review</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Recall flashcards home">
+          <span class="brand-mark" aria-hidden="true"><span>R</span></span>
+          <span><strong>Recall</strong><small>spaced repetition</small></span>
+        </a>
+        <div class="session-tools">
+          <label class="deck-picker" for="deck-select">
+            <span>Deck</span>
+            <select id="deck-select" aria-label="Choose a deck">
+              <option value="">All decks</option>
+            </select>
+          </label>
+          <div class="today-chip"><span class="live-dot"></span><span id="today-label">Today</span></div>
+        </div>
+      </header>
+
+      <section class="progress-panel" aria-label="Review progress">
+        <div>
+          <p class="eyebrow">TODAY'S SESSION</p>
+          <h1>Make it stick.</h1>
+        </div>
+        <div class="progress-stats">
+          <div><strong id="reviewed-count">0</strong><span>reviewed</span></div>
+          <div><strong id="remaining-count">0</strong><span>remaining</span></div>
+          <div><strong id="new-count">0</strong><span>new</span></div>
+        </div>
+        <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+      </section>
+
+      <section id="loading-state" class="state-card" aria-live="polite">
+        <div class="loader" aria-hidden="true"></div>
+        <p>Preparing your cards…</p>
+      </section>
+
+      <section id="review-stage" class="review-stage hidden" aria-label="Current flashcard">
+        <div class="card-meta">
+          <span id="deck-badge" class="deck-badge"></span>
+          <span id="card-kind" class="card-kind"></span>
+          <span id="card-position" class="card-position"></span>
+        </div>
+
+        <div id="flashcard" class="flashcard" role="button" tabindex="0" aria-label="Reveal answer" aria-pressed="false">
+          <span class="card-face card-front">
+            <span id="front-label" class="side-label">FRONT</span>
+            <div id="card-front-text" class="card-copy"></div>
+            <span class="reveal-hint"><kbd>Space</kbd> or click to reveal</span>
+          </span>
+          <span class="card-face card-back">
+            <span id="back-label" class="side-label">BACK</span>
+            <div id="card-back-text" class="card-copy"></div>
+            <span class="reveal-hint">How well did you remember?</span>
+          </span>
+        </div>
+
+        <div id="grade-panel" class="grade-panel" aria-label="Rate your answer">
+          <button class="grade grade-again" data-grade="1" disabled><kbd>1</kbd><span>Again<small>Start over</small></span></button>
+          <button class="grade grade-hard" data-grade="2" disabled><kbd>2</kbd><span>Hard<small>Needed effort</small></span></button>
+          <button class="grade grade-good" data-grade="3" disabled><kbd>3</kbd><span>Good<small>Remembered</small></span></button>
+          <button class="grade grade-easy" data-grade="4" disabled><kbd>4</kbd><span>Easy<small>Instant recall</small></span></button>
+        </div>
+        <p id="status-line" class="status-line" aria-live="polite"></p>
+      </section>
+
+      <section id="complete-state" class="complete-state hidden" aria-live="polite">
+        <div class="complete-icon" aria-hidden="true">✓</div>
+        <p class="eyebrow">SESSION COMPLETE</p>
+        <h2>Memory strengthened.</h2>
+        <p id="complete-copy">You have reviewed every card due today.</p>
+        <button id="refresh-button" class="primary-button" type="button">Check again</button>
+      </section>
+
+      <section id="error-state" class="state-card error-state hidden" aria-live="assertive">
+        <strong>We couldn't load your cards.</strong>
+        <p id="error-copy"></p>
+        <button id="retry-button" class="primary-button" type="button">Try again</button>
+      </section>
+
+      <footer>
+        <span>Runs on this computer</span>
+        <span>•</span>
+        <span>SM-2 scheduling</span>
+        <span class="shortcut-copy">Shortcuts: Space to flip · 1–4 to rate</span>
+      </footer>
+    </main>
+  </body>
+</html>

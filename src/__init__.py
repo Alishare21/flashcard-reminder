@@ -1,0 +1,1 @@
+"""Local flashcard reminder system."""

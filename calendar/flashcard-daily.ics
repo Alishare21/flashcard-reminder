@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Flashcard Reminder System//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:flashcard-daily-review-local@flashcard-reminder
+DTSTAMP:20261008T000000Z
+DTSTART;TZID=Asia/Kolkata:20261009T080000
+DTEND;TZID=Asia/Kolkata:20261009T081000
+RRULE:FREQ=DAILY
+SUMMARY:Review flashcards
+DESCRIPTION:Open the terminal and run python src/main.py review. The local scheduled task handles sync and email.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Review flashcards
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

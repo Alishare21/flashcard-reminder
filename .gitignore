@@ -1,0 +1,13 @@
+.env
+.secrets/
+data/
+logs/
+__pycache__/
+.pytest_cache/
+.pytest_tmp*/
+*.pyc
+node_modules/
+.trigger/
+flashcard-preview-*/
+AIS-OS/
+notes/
