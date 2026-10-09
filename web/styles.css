@@ -202,8 +202,8 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .upcoming-flip { position: relative; width: 100%; height: 164px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: inherit; text-align: left; cursor: pointer; perspective: 1000px; }
 .upcoming-flip:focus-visible { outline: 3px solid rgba(133,147,255,.7); outline-offset: 3px; }
 .upcoming-face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 18px; border-radius: 12px; backface-visibility: hidden; transition: transform .5s ease; overflow: auto; overflow-wrap: anywhere; }
-.upcoming-front { color: #26334f; background: linear-gradient(145deg, #fffdf8, #e9e4db); transform: rotateY(0); }
-.upcoming-back { color: #eff2ff; background: linear-gradient(145deg, #33416b, #1d2946); transform: rotateY(180deg); }
+.upcoming-flip .upcoming-front { color: #26334f; background: linear-gradient(145deg, #fffdf8, #e9e4db); transform: rotateY(0); }
+.upcoming-flip .upcoming-back { color: #eff2ff; background: linear-gradient(145deg, #33416b, #1d2946); transform: rotateY(180deg); }
 .upcoming-flip.flipped .upcoming-front { transform: rotateY(-180deg); }
 .upcoming-flip.flipped .upcoming-back { transform: rotateY(0); }
 .upcoming-flip strong { color: inherit; font-size: .95rem; white-space: normal; text-overflow: clip; }
@@ -213,6 +213,8 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .upcoming-back > span { font-size: .7rem; line-height: 1.4; }
 .upcoming-list strong { overflow: hidden; color: #edf0f8; font-size: .82rem; text-overflow: ellipsis; white-space: nowrap; }
 .upcoming-list span { color: var(--muted); font-size: .72rem; }
+.upcoming-list .upcoming-face strong { color: inherit; white-space: normal; text-overflow: clip; }
+.upcoming-list .upcoming-face span { color: inherit; }
 .saved-reminder-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
 .saved-reminder-actions a, .saved-reminder-actions button { padding: 7px 9px; border: 1px solid rgba(124,140,255,.35); border-radius: 8px; color: #e4e8ff; background: rgba(124,140,255,.12); font-size: .68rem; font-weight: 650; text-decoration: none; cursor: pointer; }
 .saved-reminder-actions a:hover, .saved-reminder-actions button:hover { background: rgba(124,140,255,.24); }
