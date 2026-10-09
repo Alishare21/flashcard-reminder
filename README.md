@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public page displays daily reminder status in a flashcard, shows “You're all caught up” when appropriate, detects each visitor's timezone, and can open a prefilled recurring Google Calendar event through Google's own sign-in page. Reminder settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
+The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor choose a reminder name, time, and daily, weekday, or weekly repeat rule. It previews the next three occurrences in the visitor's timezone and can open a prefilled Google Calendar event through Google's own sign-in page. Settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 
@@ -52,8 +52,8 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Email | Gmail SMTP with STARTTLS | Daily cards-due messages |
 | Local automation | Windows Task Scheduler / PowerShell | Local fallback that runs without Codex |
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
-| Public deployment | GitHub Pages and GitHub Actions | Live reminder dashboard with browser-only settings |
-| Calendar handoff | Google Calendar event template | Visitor-controlled recurring reminder without calendar credentials |
+| Public deployment | GitHub Pages and GitHub Actions | Live responsive reminder dashboard with browser-only settings |
+| Calendar handoff | Google Calendar event template | Custom daily, weekday, or weekly reminder without calendar credentials |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.
 

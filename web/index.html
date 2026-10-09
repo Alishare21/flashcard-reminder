@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
-    <title>Recall — Flashcard Review</title>
-    <link rel="stylesheet" href="styles.css?v=20261009-2">
-    <script src="app.js?v=20261009-2" defer></script>
+    <title>Recall — Flashcard Reminder</title>
+    <link rel="stylesheet" href="styles.css?v=20261009-3">
+    <script src="app.js?v=20261009-3" defer></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -44,9 +44,12 @@
       <section id="public-reminder-state" class="public-reminder-state hidden" aria-live="polite">
         <div class="empty-reminder-card">
           <span class="empty-reminder-label">TODAY</span>
-          <span class="empty-reminder-icon" aria-hidden="true">✓</span>
+          <span id="public-reminder-icon" class="empty-reminder-icon" aria-hidden="true">✓</span>
           <h1 id="public-reminder-heading">You're all caught up.</h1>
           <p id="public-reminder-copy">No reminders for today.</p>
+          <div id="reminder-status-badges" class="reminder-status-badges">
+            <span>Schedule clear</span>
+          </div>
         </div>
       </section>
 
@@ -54,18 +57,43 @@
         <div class="reminder-copy">
           <span class="reminder-icon" aria-hidden="true">◷</span>
           <div>
-            <p class="eyebrow">GOOGLE CALENDAR</p>
-            <h2 id="reminder-title">Add your daily reminder.</h2>
-            <p id="next-reminder">Choose a time for your next review.</p>
+            <p class="eyebrow">REMINDER SETUP</p>
+            <h2 id="reminder-title">Build a consistent study rhythm.</h2>
+            <p id="next-reminder">Name your reminder, choose a time, and set how often it repeats.</p>
           </div>
         </div>
         <div class="reminder-actions">
-          <label for="reminder-time">Review time</label>
-          <input id="reminder-time" type="time">
+          <label class="reminder-field reminder-name-field" for="reminder-name">
+            <span>Reminder name</span>
+            <input id="reminder-name" type="text" maxlength="80" placeholder="Flashcard review" autocomplete="off">
+          </label>
+          <label class="reminder-field" for="reminder-time">
+            <span>Time</span>
+            <input id="reminder-time" type="time">
+          </label>
+          <label class="reminder-field" for="reminder-frequency">
+            <span>Repeat</span>
+            <select id="reminder-frequency">
+              <option value="daily">Every day</option>
+              <option value="weekdays">Weekdays</option>
+              <option value="weekly">Every week</option>
+            </select>
+          </label>
           <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Set a time to continue</a>
           <button id="clear-reminder" class="clear-reminder" type="button">Clear</button>
         </div>
-        <p class="calendar-note">Choose a time, then continue with your own Google account. Google handles sign-in and asks you to review the recurring event before saving it. This site never receives your login or calendar data.</p>
+        <p class="calendar-note">Settings save automatically in this browser. Google handles sign-in and asks you to review the recurring event before saving it. This site never receives your login or calendar data.</p>
+      </section>
+
+      <section id="upcoming-panel" class="upcoming-panel hidden" aria-labelledby="upcoming-title">
+        <div class="upcoming-heading">
+          <div>
+            <p class="eyebrow">UP NEXT</p>
+            <h2 id="upcoming-title">Your next three reminders</h2>
+          </div>
+          <span id="upcoming-timezone" class="timezone-pill"></span>
+        </div>
+        <ol id="upcoming-list" class="upcoming-list"></ol>
       </section>
 
       <section id="loading-state" class="state-card" aria-live="polite">

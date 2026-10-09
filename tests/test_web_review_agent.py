@@ -77,6 +77,7 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert 'src="http' not in html and '<link rel="stylesheet" href="http' not in html
     assert 'new URL("https://calendar.google.com/calendar/render")' in script
     assert 'addEventListener("keydown"' in script
+    assert "event.target instanceof HTMLInputElement" in script
     assert 'fetch("/api/review"' in script
     assert "document.createTextNode" in script and "document.createElement(\"strong\")" in script
     assert "Question & answer" in script and "Term & definition" in script and "COMPLETE THE SENTENCE" in script
@@ -89,11 +90,14 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "empty-reminder-card" in html
     assert "public-reminder-state" in html
     assert "demo-cards.json" not in script
-    assert 'calendarLink.textContent = "Continue with Google"' in script
+    assert 'calendarLink.textContent = "Add to Google Calendar"' in script
     assert "Google handles sign-in" in html
-    assert "recall-reminder-time-v1" in script
-    assert 'url.searchParams.set("recur", "RRULE:FREQ=DAILY")' in script
+    assert "recall-reminder-config-v2" in script
+    assert 'url.searchParams.set("recur", recurrenceRule(frequency))' in script
+    assert "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" in script
     assert "resolvedOptions().timeZone" in script
+    assert all(control in html for control in ("reminder-name", "reminder-time", "reminder-frequency"))
+    assert "Your next three reminders" in html
 
 
 def test_local_server_serves_interface_assets_and_due_session(tmp_path: Path, examples: dict) -> None:
