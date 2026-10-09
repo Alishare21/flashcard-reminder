@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public page displays daily reminder status, shows “No reminders today” when appropriate, detects each visitor's timezone, and can open a prefilled recurring Google Calendar event. Reminder settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
+The public page displays daily reminder status in a flashcard, shows “You're all caught up” when appropriate, detects each visitor's timezone, and can open a prefilled recurring Google Calendar event through Google's own sign-in page. Reminder settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 
@@ -103,7 +103,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SECRET_KEY=your-private-server-key
 ```
 
-Never commit `.env`, local notes, database files, logs, or OAuth credentials. The public repository `.gitignore` excludes them. The private review mode still runs only on your computer because it displays personal card text and updates your real review history; the public demo uses only its bundled sample deck.
+Never commit `.env`, local notes, database files, logs, or OAuth credentials. The public repository `.gitignore` excludes them. The private review mode still runs only on your computer because it displays personal card text and updates your real review history. The public page displays reminder status only and never exposes card questions or answers.
 
 ## Daily commands
 

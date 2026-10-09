@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
     <title>Recall — Flashcard Review</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261009-2">
+    <script src="app.js?v=20261009-2" defer></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -42,27 +42,30 @@
       </section>
 
       <section id="public-reminder-state" class="public-reminder-state hidden" aria-live="polite">
-        <p class="eyebrow">TODAY</p>
-        <h1 id="public-reminder-heading">No reminders today.</h1>
-        <p id="public-reminder-copy">Choose a review time to create your daily reminder.</p>
+        <div class="empty-reminder-card">
+          <span class="empty-reminder-label">TODAY</span>
+          <span class="empty-reminder-icon" aria-hidden="true">✓</span>
+          <h1 id="public-reminder-heading">You're all caught up.</h1>
+          <p id="public-reminder-copy">No reminders for today.</p>
+        </div>
       </section>
 
       <section id="reminder-panel" class="reminder-panel hidden" aria-labelledby="reminder-title">
         <div class="reminder-copy">
           <span class="reminder-icon" aria-hidden="true">◷</span>
           <div>
-            <p class="eyebrow">DAILY REMINDER</p>
-            <h2 id="reminder-title">Keep your review on schedule.</h2>
+            <p class="eyebrow">GOOGLE CALENDAR</p>
+            <h2 id="reminder-title">Add your daily reminder.</h2>
             <p id="next-reminder">Choose a time for your next review.</p>
           </div>
         </div>
         <div class="reminder-actions">
           <label for="reminder-time">Review time</label>
           <input id="reminder-time" type="time">
-          <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Choose a time first</a>
+          <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Set a time to continue</a>
           <button id="clear-reminder" class="clear-reminder" type="button">Clear</button>
         </div>
-        <p class="calendar-note">Uses your browser timezone. Google Calendar opens a daily recurring event for you to review and save.</p>
+        <p class="calendar-note">Choose a time, then continue with your own Google account. Google handles sign-in and asks you to review the recurring event before saving it. This site never receives your login or calendar data.</p>
       </section>
 
       <section id="loading-state" class="state-card" aria-live="polite">
@@ -115,8 +118,8 @@
 
       <footer>
         <span id="runtime-note">Runs on this computer</span>
-        <span>•</span>
-        <span>SM-2 scheduling</span>
+        <span id="footer-divider">•</span>
+        <span id="scheduler-note">SM-2 scheduling</span>
         <span class="shortcut-copy">Shortcuts: Space to flip · 1–4 to rate</span>
       </footer>
     </main>

@@ -58,12 +58,12 @@ function updateReminder() {
   if (!timeText) {
     localStorage.removeItem(reminderStorageKey);
     el("next-reminder").textContent = "No reminder time selected.";
-    el("public-reminder-heading").textContent = "No reminders today.";
-    el("public-reminder-copy").textContent = "Choose a review time to create your daily reminder.";
+    el("public-reminder-heading").textContent = "You're all caught up.";
+    el("public-reminder-copy").textContent = "No reminders for today.";
     calendarLink.removeAttribute("href");
     calendarLink.classList.add("disabled");
     calendarLink.setAttribute("aria-disabled", "true");
-    calendarLink.textContent = "Choose a time first";
+    calendarLink.textContent = "Set a time to continue";
     return;
   }
   localStorage.setItem(reminderStorageKey, timeText);
@@ -75,10 +75,10 @@ function updateReminder() {
   }).format(start);
   el("next-reminder").textContent = `Next review: ${display} · ${timezone}`;
   const isToday = start.toDateString() === new Date().toDateString();
-  el("public-reminder-heading").textContent = isToday ? "1 reminder today." : "No reminders today.";
+  el("public-reminder-heading").textContent = isToday ? "Reminder scheduled." : "You're all caught up.";
   el("public-reminder-copy").textContent = isToday
     ? `Review flashcards at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(start)}.`
-    : `Next reminder: ${display}.`;
+    : `No reminders for today. Next reminder: ${display}.`;
   const url = new URL("https://calendar.google.com/calendar/render");
   url.searchParams.set("action", "TEMPLATE");
   url.searchParams.set("text", "Review flashcards");
@@ -89,7 +89,7 @@ function updateReminder() {
   calendarLink.href = url.toString();
   calendarLink.classList.remove("disabled");
   calendarLink.setAttribute("aria-disabled", "false");
-  calendarLink.textContent = "Add to Google Calendar";
+  calendarLink.textContent = "Continue with Google";
 }
 
 function showOnly(section) {
@@ -279,6 +279,9 @@ document.addEventListener("keydown", (event) => {
 if (demoMode) {
   el("runtime-note").textContent = "Public reminder dashboard · settings stay in this browser";
   el("brand-subtitle").textContent = "daily reminders";
+  el("footer-divider").classList.add("hidden");
+  el("scheduler-note").classList.add("hidden");
+  document.querySelector(".shortcut-copy").classList.add("hidden");
   el("progress-panel").classList.add("hidden");
   el("deck-picker").classList.add("hidden");
   reminderPanel.classList.remove("hidden");

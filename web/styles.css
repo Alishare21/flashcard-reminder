@@ -98,9 +98,47 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .progress-track { grid-column: 1 / -1; height: 4px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.09); }
 .progress-track span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6f7eff, #65d9ba); transition: width .4s ease; }
 
-.public-reminder-state { margin: 64px 0 26px; }
-.public-reminder-state h1 { max-width: 850px; }
-.public-reminder-state > p:last-child { margin: 12px 0 0; color: var(--muted); }
+.public-reminder-state { width: min(760px, 100%); margin: 64px auto 26px; }
+.empty-reminder-card {
+  position: relative;
+  min-height: clamp(300px, 43vh, 420px);
+  padding: clamp(38px, 7vw, 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--card-ink);
+  border-radius: 28px;
+  background: linear-gradient(145deg, #fffdf8, #ece6da);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.empty-reminder-card::after {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  right: -110px;
+  bottom: -130px;
+  border-radius: 50%;
+  background: rgba(75, 212, 160, .13);
+}
+.empty-reminder-label { position: absolute; top: 28px; color: #677185; font-size: .66rem; font-weight: 800; letter-spacing: .18em; }
+.empty-reminder-icon {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 22px;
+  display: grid;
+  place-items: center;
+  color: #176b50;
+  border-radius: 50%;
+  background: rgba(75, 212, 160, .2);
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+.empty-reminder-card h1 { max-width: 650px; font-size: clamp(2rem, 4.5vw, 3.5rem); }
+.empty-reminder-card p { margin: 14px 0 0; color: #667085; font-size: clamp(.95rem, 2vw, 1.08rem); }
 
 .reminder-panel {
   margin: 0 0 22px;
