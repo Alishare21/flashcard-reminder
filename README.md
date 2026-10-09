@@ -2,9 +2,9 @@
 
 A local-first flashcard application that converts Markdown notes into visual study cards, schedules reviews with the deterministic SM-2 spaced-repetition algorithm, supports browser and terminal review sessions, and sends daily email reminders. Review history stays in SQLite and is mirrored to a private Supabase database so Trigger.dev can run the reminder every day without Codex or the local computer.
 
-**Live public demo:** [Open Recall Flashcards](https://alishare21.github.io/flashcard-reminder/)
+**Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public demo contains a safe Data Science and AI sample deck. It runs entirely in the browser, saves SM-2 review progress in browser storage, displays the next daily review time in each visitor's timezone, and can open a prefilled recurring Google Calendar event. Personal notes, review history, email settings, calendar data, and cloud credentials remain private.
+The public page displays daily reminder status, shows “No reminders today” when appropriate, detects each visitor's timezone, and can open a prefilled recurring Google Calendar event. Reminder settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 
@@ -52,7 +52,7 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Email | Gmail SMTP with STARTTLS | Daily cards-due messages |
 | Local automation | Windows Task Scheduler / PowerShell | Local fallback that runs without Codex |
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
-| Public deployment | GitHub Pages and GitHub Actions | Live browser demo with browser-only review state |
+| Public deployment | GitHub Pages and GitHub Actions | Live reminder dashboard with browser-only settings |
 | Calendar handoff | Google Calendar event template | Visitor-controlled recurring reminder without calendar credentials |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.

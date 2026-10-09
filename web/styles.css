@@ -98,6 +98,10 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .progress-track { grid-column: 1 / -1; height: 4px; overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.09); }
 .progress-track span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6f7eff, #65d9ba); transition: width .4s ease; }
 
+.public-reminder-state { margin: 64px 0 26px; }
+.public-reminder-state h1 { max-width: 850px; }
+.public-reminder-state > p:last-child { margin: 12px 0 0; color: var(--muted); }
+
 .reminder-panel {
   margin: 0 0 22px;
   padding: 18px 20px;
@@ -119,6 +123,9 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .reminder-actions input { min-height: 40px; padding: 8px 10px; color: var(--ink); color-scheme: dark; border: 1px solid var(--line); border-radius: 11px; background: rgba(15, 22, 36, .78); }
 .calendar-button { min-height: 40px; padding: 10px 14px; border-radius: 11px; color: white; background: #6979ef; font-size: .76rem; font-weight: 750; text-decoration: none; white-space: nowrap; }
 .calendar-button:hover { background: #7b89f5; }
+.calendar-button.disabled { opacity: .45; pointer-events: none; }
+.clear-reminder { min-height: 40px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 11px; color: var(--muted); background: transparent; cursor: pointer; }
+.clear-reminder:hover { color: var(--ink); border-color: rgba(255, 255, 255, .24); }
 .calendar-note { grid-column: 1 / -1; margin: 0 0 0 56px; color: #758197; font-size: .68rem; }
 
 .review-stage { width: min(760px, 100%); margin: 12px auto 0; }
@@ -228,6 +235,7 @@ footer { margin-top: auto; padding-top: 30px; gap: 10px; color: #6f7a8e; font-si
   .deck-picker span { display: none; }
   .deck-picker { padding-left: 12px; }
   .progress-panel { margin-top: 38px; grid-template-columns: 1fr; align-items: start; }
+  .public-reminder-state { margin-top: 42px; }
   .progress-stats { justify-content: space-between; }
   .progress-track { grid-column: 1; }
   .reminder-panel { grid-template-columns: 1fr; padding: 16px; }

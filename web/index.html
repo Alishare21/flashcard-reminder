@@ -15,10 +15,10 @@
       <header class="topbar">
         <a class="brand" href="./" aria-label="Recall flashcards home">
           <span class="brand-mark" aria-hidden="true"><span>R</span></span>
-          <span><strong>Recall</strong><small>spaced repetition</small></span>
+          <span><strong>Recall</strong><small id="brand-subtitle">spaced repetition</small></span>
         </a>
         <div class="session-tools">
-          <label class="deck-picker" for="deck-select">
+          <label id="deck-picker" class="deck-picker" for="deck-select">
             <span>Deck</span>
             <select id="deck-select" aria-label="Choose a deck">
               <option value="">All decks</option>
@@ -28,7 +28,7 @@
         </div>
       </header>
 
-      <section class="progress-panel" aria-label="Review progress">
+      <section id="progress-panel" class="progress-panel" aria-label="Review progress">
         <div>
           <p class="eyebrow">TODAY'S SESSION</p>
           <h1>Make it stick.</h1>
@@ -39,6 +39,12 @@
           <div><strong id="new-count">0</strong><span>new</span></div>
         </div>
         <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+      </section>
+
+      <section id="public-reminder-state" class="public-reminder-state hidden" aria-live="polite">
+        <p class="eyebrow">TODAY</p>
+        <h1 id="public-reminder-heading">No reminders today.</h1>
+        <p id="public-reminder-copy">Choose a review time to create your daily reminder.</p>
       </section>
 
       <section id="reminder-panel" class="reminder-panel hidden" aria-labelledby="reminder-title">
@@ -52,8 +58,9 @@
         </div>
         <div class="reminder-actions">
           <label for="reminder-time">Review time</label>
-          <input id="reminder-time" type="time" value="08:00">
-          <a id="google-calendar-link" class="calendar-button" href="https://calendar.google.com/" target="_blank" rel="noopener">Add to Google Calendar</a>
+          <input id="reminder-time" type="time">
+          <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Choose a time first</a>
+          <button id="clear-reminder" class="clear-reminder" type="button">Clear</button>
         </div>
         <p class="calendar-note">Uses your browser timezone. Google Calendar opens a daily recurring event for you to review and save.</p>
       </section>

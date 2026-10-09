@@ -75,7 +75,7 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert all(label in html for label in ("Again", "Hard", "Good", "Easy"))
     assert 'src="app.js"' in html and 'href="styles.css"' in html
     assert 'src="http' not in html and '<link rel="stylesheet" href="http' not in html
-    assert 'href="https://calendar.google.com/"' in html
+    assert 'new URL("https://calendar.google.com/calendar/render")' in script
     assert 'addEventListener("keydown"' in script
     assert 'fetch("/api/review"' in script
     assert "document.createTextNode" in script and "document.createElement(\"strong\")" in script
@@ -84,9 +84,10 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "python src/main.py web" in script
     assert 'window.location.assign(localServerUrl)' in script
     assert 'window.location.hostname.endsWith("github.io")' in script
-    assert "recall-public-demo-v1" in script
-    assert (WEB_ROOT / "demo-cards.json").exists()
-    assert "Add to Google Calendar" in html
+    assert "No reminders today." in html
+    assert "public-reminder-state" in html
+    assert "demo-cards.json" not in script
+    assert 'calendarLink.textContent = "Add to Google Calendar"' in script
     assert "recall-reminder-time-v1" in script
     assert 'url.searchParams.set("recur", "RRULE:FREQ=DAILY")' in script
     assert "resolvedOptions().timeZone" in script
