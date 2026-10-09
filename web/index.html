@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
     <title>Recall — Flashcard Reminder</title>
-    <link rel="stylesheet" href="styles.css?v=20261009-6">
-    <script type="module" src="app.js?v=20261009-6"></script>
+    <link rel="stylesheet" href="styles.css?v=20261009-7">
+    <script type="module" src="app.js?v=20261009-7"></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -42,13 +42,24 @@
       </section>
 
       <section id="public-reminder-state" class="public-reminder-state hidden" aria-live="polite">
-        <div class="empty-reminder-card">
-          <span class="empty-reminder-label">TODAY</span>
-          <span id="public-reminder-icon" class="empty-reminder-icon" aria-hidden="true">✓</span>
-          <h1 id="public-reminder-heading">You're all caught up.</h1>
-          <p id="public-reminder-copy">No reminders for today.</p>
-          <div id="reminder-status-badges" class="reminder-status-badges">
-            <span>Schedule clear</span>
+        <div id="today-reminder-card" class="empty-reminder-card">
+          <div id="today-reminder-front" class="reminder-card-face reminder-card-front">
+            <span class="empty-reminder-label">TODAY</span>
+            <span id="public-reminder-icon" class="empty-reminder-icon" aria-hidden="true">✓</span>
+            <h1 id="public-reminder-heading">You're all caught up.</h1>
+            <p id="public-reminder-copy">No reminders for today.</p>
+            <div id="reminder-status-badges" class="reminder-status-badges">
+              <span>Schedule clear</span>
+            </div>
+            <span id="today-flip-hint" class="today-flip-hint hidden">Click or press Space to flip</span>
+          </div>
+          <div id="today-reminder-back" class="reminder-card-face reminder-card-back" aria-hidden="true">
+            <span class="empty-reminder-label">REMINDER DETAILS</span>
+            <h2 id="today-back-heading"></h2>
+            <p id="today-back-date"></p>
+            <p id="today-back-source"></p>
+            <p id="today-back-detail"></p>
+            <span class="today-flip-hint">Click or press Space to return</span>
           </div>
         </div>
       </section>
@@ -105,7 +116,7 @@
         <div class="upcoming-heading">
           <div>
             <p class="eyebrow">UP NEXT</p>
-            <h2 id="upcoming-title">Your saved reminders</h2>
+            <h2 id="upcoming-title">Your reminder cards</h2>
           </div>
           <span id="upcoming-timezone" class="timezone-pill"></span>
         </div>

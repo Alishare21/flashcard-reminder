@@ -102,7 +102,11 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" in script
     assert "resolvedOptions().timeZone" in script
     assert all(control in html for control in ("reminder-name", "reminder-time", "reminder-frequency"))
-    assert "Your saved reminders" in html
+    assert "Your reminder cards" in html
+    assert 'id="today-reminder-card"' in html
+    assert 'className = "upcoming-flip"' in script
+    assert 'flip.addEventListener("click"' in script
+    assert 'todayReminderCard.addEventListener("keydown"' in script
     assert 'id="save-reminder"' in html
     assert "persistReminders(reminders.filter" in script
 

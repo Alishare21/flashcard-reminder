@@ -24,6 +24,7 @@ export function normalizeCalendarEvent(event, calendarName, now = new Date()) {
     allDay,
     source: calendarName || "Google Calendar",
     kind: "event",
+    detail: [event.location, event.description].filter(Boolean).join(" · ").slice(0, 300),
     url: typeof event.htmlLink === "string" && event.htmlLink.startsWith("https://calendar.google.com/")
       ? event.htmlLink : "https://calendar.google.com/calendar/u/0/r",
   };
@@ -40,6 +41,7 @@ export function normalizeGoogleTask(task, listName) {
     allDay: true,
     source: listName || "Google Tasks",
     kind: "task",
+    detail: String(task.notes || "").slice(0, 300),
     url: "https://tasks.google.com/",
   };
 }

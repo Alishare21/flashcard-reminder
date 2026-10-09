@@ -5,7 +5,7 @@ import { fetchGoogleItems, normalizeCalendarEvent, normalizeGoogleTask } from ".
 test("calendar events keep dates and omit cancelled or ended entries", () => {
   const now = new Date("2026-10-09T00:00:00Z");
   const event = {
-    id: "meeting", summary: "Project review",
+    id: "meeting", summary: "Project review", location: "Room 2", description: "Bring notes",
     start: { dateTime: "2026-10-10T10:00:00Z" },
     end: { dateTime: "2026-10-10T11:00:00Z" },
     htmlLink: "https://calendar.google.com/calendar/event?eid=meeting",
@@ -13,6 +13,7 @@ test("calendar events keep dates and omit cancelled or ended entries", () => {
   const result = normalizeCalendarEvent(event, "Work", now);
   assert.equal(result.name, "Project review");
   assert.equal(result.source, "Work");
+  assert.equal(result.detail, "Room 2 · Bring notes");
   assert.equal(result.start.toISOString(), "2026-10-10T10:00:00.000Z");
   assert.equal(normalizeCalendarEvent({ ...event, status: "cancelled" }, "Work", now), null);
   assert.equal(normalizeCalendarEvent({ ...event, end: { dateTime: "2026-10-08T11:00:00Z" } }, "Work", now), null);
@@ -24,9 +25,10 @@ test("calendar events keep dates and omit cancelled or ended entries", () => {
 });
 
 test("tasks include undated items and omit completed items", () => {
-  const task = normalizeGoogleTask({ id: "t1", title: "Revise lesson", due: "2026-10-10T00:00:00.000Z" }, "Study");
+  const task = normalizeGoogleTask({ id: "t1", title: "Revise lesson", due: "2026-10-10T00:00:00.000Z", notes: "Chapter 3" }, "Study");
   assert.equal(task.name, "Revise lesson");
   assert.equal(task.source, "Study");
+  assert.equal(task.detail, "Chapter 3");
   assert.equal(task.start.getFullYear(), 2026);
   assert.equal(normalizeGoogleTask({ id: "t2", title: "Someday" }, "Study").start, null);
   assert.equal(normalizeGoogleTask({ id: "t3", status: "completed" }, "Study"), null);

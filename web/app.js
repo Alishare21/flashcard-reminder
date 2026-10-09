@@ -32,6 +32,7 @@ const reminderTime = el("reminder-time");
 const reminderFrequency = el("reminder-frequency");
 const saveReminderButton = el("save-reminder");
 const publicReminderState = el("public-reminder-state");
+const todayReminderCard = el("today-reminder-card");
 const upcomingPanel = el("upcoming-panel");
 const upcomingList = el("upcoming-list");
 let reminderWeekday = new Date().getDay();
@@ -141,6 +142,21 @@ function renderStatusBadges(labels) {
   });
 }
 
+function formatReminderDate(start, allDay = false) {
+  if (!start) return "No due date";
+  return new Intl.DateTimeFormat(undefined, allDay
+    ? { weekday: "long", month: "long", day: "numeric" }
+    : { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }).format(start);
+}
+
+function toggleTodayCard() {
+  if (!todayReminderCard.hasAttribute("tabindex")) return;
+  const flipped = todayReminderCard.classList.toggle("flipped");
+  todayReminderCard.setAttribute("aria-pressed", String(flipped));
+  el("today-reminder-front").setAttribute("aria-hidden", String(flipped));
+  el("today-reminder-back").setAttribute("aria-hidden", String(!flipped));
+}
+
 function calendarUrl(reminder, start, timezone) {
   const end = new Date(start.getTime() + 10 * 60 * 1000);
   const url = new URL("https://calendar.google.com/calendar/render");
@@ -194,22 +210,62 @@ function renderSavedReminders() {
   el("public-reminder-copy").textContent = today.length
     ? `${today.length} item${today.length === 1 ? "" : "s"} due today${today[0].reminder.allDay ? "." : `. Next at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(today[0].start)}.`}`
     : "No reminders for today.";
+  todayReminderCard.classList.remove("flipped");
+  el("today-reminder-front").setAttribute("aria-hidden", "false");
+  el("today-reminder-back").setAttribute("aria-hidden", "true");
+  el("today-flip-hint").classList.toggle("hidden", !today.length);
+  if (today.length) {
+    const { kind, reminder, start } = today[0];
+    todayReminderCard.setAttribute("role", "button");
+    todayReminderCard.setAttribute("tabindex", "0");
+    todayReminderCard.setAttribute("aria-pressed", "false");
+    todayReminderCard.setAttribute("aria-label", `Flip reminder: ${reminder.name}`);
+    el("today-back-heading").textContent = reminder.name;
+    el("today-back-date").textContent = formatReminderDate(start, reminder.allDay);
+    el("today-back-source").textContent = kind === "google"
+      ? `${reminder.kind === "task" ? "Google Task" : "Google Calendar event"} · ${reminder.source}`
+      : `Saved reminder · ${frequencyLabel(reminder.frequency)}`;
+    el("today-back-detail").textContent = reminder.detail || "Open the card below for actions.";
+  } else {
+    for (const attribute of ["role", "tabindex", "aria-pressed", "aria-label"]) todayReminderCard.removeAttribute(attribute);
+  }
   renderStatusBadges([`${reminders.length} saved`, `${googleItems.length} Google`, timezone]);
   upcomingList.replaceChildren();
   scheduled.forEach(({ kind, reminder, start }) => {
     const item = document.createElement("li");
+    const flip = document.createElement("button");
+    flip.type = "button";
+    flip.className = "upcoming-flip";
+    flip.setAttribute("aria-label", `Flip reminder: ${reminder.name}`);
+    flip.setAttribute("aria-pressed", "false");
+    const front = document.createElement("span");
+    front.className = "upcoming-face upcoming-front";
+    const frontKind = document.createElement("span");
+    frontKind.className = "upcoming-kind";
+    frontKind.textContent = kind === "google" ? reminder.kind === "task" ? "GOOGLE TASK" : "CALENDAR EVENT" : "SAVED REMINDER";
     const name = document.createElement("strong");
     name.textContent = reminder.name;
-    const date = document.createElement("span");
-    date.textContent = kind === "google"
-      ? `${reminder.kind === "task" ? "Task" : "Event"} · ${reminder.source} · ${start
-        ? new Intl.DateTimeFormat(undefined, reminder.allDay
-          ? { weekday: "short", month: "short", day: "numeric" }
-          : { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(start)
-        : "No due date"}`
-      : `${new Intl.DateTimeFormat(undefined, {
-      weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-    }).format(start)} · ${frequencyLabel(reminder.frequency)}`;
+    const flipHint = document.createElement("span");
+    flipHint.className = "upcoming-flip-hint";
+    flipHint.textContent = "Tap to see details ↗";
+    front.append(frontKind, name, flipHint);
+    const back = document.createElement("span");
+    back.className = "upcoming-face upcoming-back";
+    back.setAttribute("aria-hidden", "true");
+    const when = document.createElement("strong");
+    when.textContent = formatReminderDate(start, reminder.allDay);
+    const source = document.createElement("span");
+    source.textContent = kind === "google" ? reminder.source : frequencyLabel(reminder.frequency);
+    const detail = document.createElement("span");
+    detail.textContent = reminder.detail || "Tap to return";
+    back.append(when, source, detail);
+    flip.append(front, back);
+    flip.addEventListener("click", () => {
+      const flipped = flip.classList.toggle("flipped");
+      flip.setAttribute("aria-pressed", String(flipped));
+      front.setAttribute("aria-hidden", String(flipped));
+      back.setAttribute("aria-hidden", String(!flipped));
+    });
     const actions = document.createElement("div");
     actions.className = "saved-reminder-actions";
     const calendar = document.createElement("a");
@@ -219,7 +275,7 @@ function renderSavedReminders() {
     calendar.textContent = kind === "google" ? "Open in Google" : "Add to Google Calendar";
     if (kind === "google") {
       actions.append(calendar);
-      item.append(name, date, actions);
+      item.append(flip, actions);
       upcomingList.append(item);
       return;
     }
@@ -248,7 +304,7 @@ function renderSavedReminders() {
       } catch (_error) { el("reminder-feedback").textContent = "Could not save. Check browser storage settings."; }
     });
     actions.append(calendar, edit, remove);
-    item.append(name, date, actions);
+    item.append(flip, actions);
     upcomingList.append(item);
   });
   el("upcoming-timezone").textContent = timezone;
@@ -467,6 +523,12 @@ document.addEventListener("keydown", (event) => {
 });
 
 if (demoMode) {
+  todayReminderCard.addEventListener("click", toggleTodayCard);
+  todayReminderCard.addEventListener("keydown", (event) => {
+    if (event.key !== " " && event.key !== "Enter") return;
+    event.preventDefault();
+    toggleTodayCard();
+  });
   el("runtime-note").textContent = "Public reminder dashboard · settings stay in this browser";
   el("brand-subtitle").textContent = "daily reminders";
   el("footer-divider").classList.add("hidden");
