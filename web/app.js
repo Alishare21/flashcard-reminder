@@ -39,6 +39,8 @@ let reminderWeekday = new Date().getDay();
 let reminders = [];
 let editingReminderId = null;
 let googleItems = [];
+let todayItems = [];
+let todayIndex = 0;
 
 function localDate() {
   const date = new Date();
@@ -157,6 +159,43 @@ function toggleTodayCard() {
   el("today-reminder-back").setAttribute("aria-hidden", String(!flipped));
 }
 
+function renderTodayCard() {
+  const count = todayItems.length;
+  const current = todayItems[todayIndex];
+  todayReminderCard.classList.remove("flipped");
+  el("today-reminder-front").setAttribute("aria-hidden", "false");
+  el("today-reminder-back").setAttribute("aria-hidden", "true");
+  el("today-flip-hint").classList.toggle("hidden", !count);
+  el("today-reminder-navigation").classList.toggle("hidden", count < 2);
+  el("today-position").textContent = count ? `${todayIndex + 1} of ${count} due today` : "";
+  el("public-reminder-icon").textContent = count ? "◷" : "✓";
+  el("public-reminder-heading").textContent = current ? current.reminder.name : "You're all caught up.";
+  el("public-reminder-copy").textContent = current
+    ? `${count} reminder${count === 1 ? "" : "s"} due today${current.reminder.allDay ? "." : ` · ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(current.start)}`}`
+    : "No reminders for today.";
+  if (!current) {
+    for (const attribute of ["role", "tabindex", "aria-pressed", "aria-label"]) todayReminderCard.removeAttribute(attribute);
+    return;
+  }
+  const { kind, reminder, start } = current;
+  todayReminderCard.setAttribute("role", "button");
+  todayReminderCard.setAttribute("tabindex", "0");
+  todayReminderCard.setAttribute("aria-pressed", "false");
+  todayReminderCard.setAttribute("aria-label", `Flip reminder: ${reminder.name}`);
+  el("today-back-heading").textContent = reminder.name;
+  el("today-back-date").textContent = formatReminderDate(start, reminder.allDay);
+  el("today-back-source").textContent = kind === "google"
+    ? `${reminder.kind === "task" ? "Google Task" : "Google Calendar event"} · ${reminder.source}`
+    : `Saved reminder · ${frequencyLabel(reminder.frequency)}`;
+  el("today-back-detail").textContent = reminder.detail || "Open the card below for actions.";
+}
+
+function changeTodayCard(step) {
+  if (todayItems.length < 2) return;
+  todayIndex = (todayIndex + step + todayItems.length) % todayItems.length;
+  renderTodayCard();
+}
+
 function calendarUrl(reminder, start, timezone) {
   const end = new Date(start.getTime() + 10 * 60 * 1000);
   const url = new URL("https://calendar.google.com/calendar/render");
@@ -205,30 +244,9 @@ function renderSavedReminders() {
       ? start.toDateString() === now.toDateString() || start < now
       : start.toDateString() === now.toDateString()
   ));
-  el("public-reminder-icon").textContent = today.length ? "◷" : "✓";
-  el("public-reminder-heading").textContent = today.length ? today[0].reminder.name : "You're all caught up.";
-  el("public-reminder-copy").textContent = today.length
-    ? `${today.length} item${today.length === 1 ? "" : "s"} due today${today[0].reminder.allDay ? "." : `. Next at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(today[0].start)}.`}`
-    : "No reminders for today.";
-  todayReminderCard.classList.remove("flipped");
-  el("today-reminder-front").setAttribute("aria-hidden", "false");
-  el("today-reminder-back").setAttribute("aria-hidden", "true");
-  el("today-flip-hint").classList.toggle("hidden", !today.length);
-  if (today.length) {
-    const { kind, reminder, start } = today[0];
-    todayReminderCard.setAttribute("role", "button");
-    todayReminderCard.setAttribute("tabindex", "0");
-    todayReminderCard.setAttribute("aria-pressed", "false");
-    todayReminderCard.setAttribute("aria-label", `Flip reminder: ${reminder.name}`);
-    el("today-back-heading").textContent = reminder.name;
-    el("today-back-date").textContent = formatReminderDate(start, reminder.allDay);
-    el("today-back-source").textContent = kind === "google"
-      ? `${reminder.kind === "task" ? "Google Task" : "Google Calendar event"} · ${reminder.source}`
-      : `Saved reminder · ${frequencyLabel(reminder.frequency)}`;
-    el("today-back-detail").textContent = reminder.detail || "Open the card below for actions.";
-  } else {
-    for (const attribute of ["role", "tabindex", "aria-pressed", "aria-label"]) todayReminderCard.removeAttribute(attribute);
-  }
+  todayItems = today;
+  todayIndex = 0;
+  renderTodayCard();
   renderStatusBadges([`${reminders.length} saved`, `${googleItems.length} Google`, timezone]);
   upcomingList.replaceChildren();
   scheduled.forEach(({ kind, reminder, start }) => {
@@ -529,6 +547,8 @@ if (demoMode) {
     event.preventDefault();
     toggleTodayCard();
   });
+  el("today-previous").addEventListener("click", () => changeTodayCard(-1));
+  el("today-next").addEventListener("click", () => changeTodayCard(1));
   el("runtime-note").textContent = "Public reminder dashboard · settings stay in this browser";
   el("brand-subtitle").textContent = "daily reminders";
   el("footer-divider").classList.add("hidden");

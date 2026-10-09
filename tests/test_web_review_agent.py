@@ -104,6 +104,9 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert all(control in html for control in ("reminder-name", "reminder-time", "reminder-frequency"))
     assert "Your reminder cards" in html
     assert 'id="today-reminder-card"' in html
+    assert 'id="today-reminder-navigation"' in html
+    assert 'id="today-position"' in html
+    assert 'changeTodayCard(-1)' in script and 'changeTodayCard(1)' in script
     assert 'className = "upcoming-flip"' in script
     assert 'flip.addEventListener("click"' in script
     assert 'todayReminderCard.addEventListener("keydown"' in script
