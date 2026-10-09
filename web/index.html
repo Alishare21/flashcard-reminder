@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
     <title>Recall — Flashcard Reminder</title>
-    <link rel="stylesheet" href="styles.css?v=20261009-4">
-    <script src="app.js?v=20261009-4" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261009-5">
+    <script src="app.js?v=20261009-5" defer></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -57,9 +57,9 @@
         <div class="reminder-copy">
           <span class="reminder-icon" aria-hidden="true">◷</span>
           <div>
-            <p class="eyebrow">REMINDER SETUP</p>
-            <h2 id="reminder-title">Build a consistent study rhythm.</h2>
-            <p id="next-reminder">Name your reminder, choose a time, and set how often it repeats.</p>
+            <p class="eyebrow">REMINDERS</p>
+            <h2 id="reminder-title">Create a reminder card.</h2>
+            <p id="next-reminder">Name an event, choose a time, and decide when it repeats.</p>
           </div>
         </div>
         <div class="reminder-actions">
@@ -79,18 +79,19 @@
               <option value="weekly">Every week</option>
             </select>
           </label>
-          <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Set a time to continue</a>
+          <button id="save-reminder" class="calendar-button" type="button">Save reminder</button>
           <a id="open-google-calendar" class="calendar-open-button" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Open Google Calendar</a>
-          <button id="clear-reminder" class="clear-reminder" type="button">Clear</button>
+          <button id="clear-reminder" class="clear-reminder" type="button">Reset form</button>
         </div>
-        <p class="calendar-note">Settings save in this browser. Add to Google Calendar opens a prefilled event for you to review and save. Open Google Calendar lets you sign in and check your saved events; this page does not import them.</p>
+        <p id="reminder-feedback" class="reminder-feedback" role="status" aria-live="polite"></p>
+        <p class="calendar-note">Your reminder cards are saved in this browser. Each card can open a prefilled Google Calendar event for you to review and save. Changes made later in Google Calendar must also be made here.</p>
       </section>
 
       <section id="upcoming-panel" class="upcoming-panel hidden" aria-labelledby="upcoming-title">
         <div class="upcoming-heading">
           <div>
             <p class="eyebrow">UP NEXT</p>
-            <h2 id="upcoming-title">Your next three reminders</h2>
+            <h2 id="upcoming-title">Your saved reminders</h2>
           </div>
           <span id="upcoming-timezone" class="timezone-pill"></span>
         </div>

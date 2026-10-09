@@ -90,16 +90,19 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "empty-reminder-card" in html
     assert "public-reminder-state" in html
     assert "demo-cards.json" not in script
-    assert 'calendarLink.textContent = "Add to Google Calendar"' in script
+    assert 'calendar.textContent = "Add to Google Calendar"' in script
     assert 'id="open-google-calendar"' in html
     assert 'href="https://calendar.google.com/calendar/u/0/r"' in html
-    assert "this page does not import them" in html
-    assert "recall-reminder-config-v2" in script
-    assert 'url.searchParams.set("recur", recurrenceRule(frequency))' in script
+    assert "Changes made later in Google Calendar must also be made here" in html
+    assert "recall-reminders-v3" in script
+    assert "recall-reminder-config-v2" in script  # prior browser setting is migrated
+    assert 'url.searchParams.set("recur", recurrenceRule(reminder.frequency))' in script
     assert "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" in script
     assert "resolvedOptions().timeZone" in script
     assert all(control in html for control in ("reminder-name", "reminder-time", "reminder-frequency"))
-    assert "Your next three reminders" in html
+    assert "Your saved reminders" in html
+    assert 'id="save-reminder"' in html
+    assert "persistReminders(reminders.filter" in script
 
 
 def test_local_server_serves_interface_assets_and_due_session(tmp_path: Path, examples: dict) -> None:

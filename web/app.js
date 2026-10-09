@@ -3,7 +3,8 @@
 const el = (id) => document.getElementById(id);
 const localServerUrl = "http://127.0.0.1:8765/";
 const demoMode = window.location.hostname.endsWith("github.io") || new URLSearchParams(window.location.search).has("demo");
-const reminderStorageKey = "recall-reminder-config-v2";
+const reminderStorageKey = "recall-reminders-v3";
+const previousReminderStorageKey = "recall-reminder-config-v2";
 const legacyReminderTimeKey = "recall-reminder-time-v1";
 const allowedFrequencies = new Set(["daily", "weekdays", "weekly"]);
 const state = {
@@ -27,11 +28,13 @@ const reminderPanel = el("reminder-panel");
 const reminderName = el("reminder-name");
 const reminderTime = el("reminder-time");
 const reminderFrequency = el("reminder-frequency");
-const calendarLink = el("google-calendar-link");
+const saveReminderButton = el("save-reminder");
 const publicReminderState = el("public-reminder-state");
 const upcomingPanel = el("upcoming-panel");
 const upcomingList = el("upcoming-list");
 let reminderWeekday = new Date().getDay();
+let reminders = [];
+let editingReminderId = null;
 
 function localDate() {
   const date = new Date();
@@ -64,15 +67,6 @@ function nextReminderDate(timeText, frequency, anchorWeekday, from = new Date())
   return next;
 }
 
-function advanceOccurrence(date, frequency) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + (frequency === "weekly" ? 7 : 1));
-  if (frequency === "weekdays") {
-    while (next.getDay() === 0 || next.getDay() === 6) next.setDate(next.getDate() + 1);
-  }
-  return next;
-}
-
 function frequencyLabel(frequency) {
   return { daily: "Every day", weekdays: "Weekdays", weekly: "Every week" }[frequency] || "Every day";
 }
@@ -83,29 +77,50 @@ function recurrenceRule(frequency) {
   return "RRULE:FREQ=DAILY";
 }
 
-function loadReminderConfig() {
-  const fallback = {
-    name: "Flashcard review", time: localStorage.getItem(legacyReminderTimeKey) || "",
-    frequency: "daily", weekday: new Date().getDay(),
-  };
-  try {
-    const saved = JSON.parse(localStorage.getItem(reminderStorageKey));
-    if (!saved || typeof saved !== "object") return fallback;
-    return {
-      name: typeof saved.name === "string" ? saved.name.slice(0, 80) : fallback.name,
-      time: /^\d{2}:\d{2}$/.test(saved.time || "") ? saved.time : fallback.time,
-      frequency: allowedFrequencies.has(saved.frequency) ? saved.frequency : "daily",
-      weekday: Number.isInteger(saved.weekday) && saved.weekday >= 0 && saved.weekday <= 6
-        ? saved.weekday : fallback.weekday,
-    };
-  } catch (_error) {
-    return fallback;
-  }
+function validTime(value) {
+  if (typeof value !== "string" || !/^\d{2}:\d{2}$/.test(value)) return false;
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours <= 23 && minutes <= 59;
 }
 
-function saveReminderConfig(name, time, frequency) {
-  localStorage.setItem(reminderStorageKey, JSON.stringify({ name, time, frequency, weekday: reminderWeekday }));
-  localStorage.removeItem(legacyReminderTimeKey);
+function normalizeReminder(value) {
+  if (!value || typeof value !== "object" || !validTime(value.time)) return null;
+  const name = typeof value.name === "string" ? value.name.trim().slice(0, 80) : "";
+  return {
+    id: typeof value.id === "string" && value.id ? value.id : crypto.randomUUID(),
+    name: name || "Flashcard review",
+    time: value.time,
+    frequency: allowedFrequencies.has(value.frequency) ? value.frequency : "daily",
+    weekday: Number.isInteger(value.weekday) && value.weekday >= 0 && value.weekday <= 6
+      ? value.weekday : new Date().getDay(),
+  };
+}
+
+function loadReminders() {
+  try {
+    const current = localStorage.getItem(reminderStorageKey);
+    if (current !== null) {
+      const parsed = JSON.parse(current);
+      return Array.isArray(parsed) ? parsed.map(normalizeReminder).filter(Boolean) : [];
+    }
+  } catch (_error) { return []; }
+  let previous = null;
+  try { previous = JSON.parse(localStorage.getItem(previousReminderStorageKey)); } catch (_error) { /* ignore invalid legacy data */ }
+  const legacyTime = localStorage.getItem(legacyReminderTimeKey);
+  const migrated = normalizeReminder(previous || { name: "Flashcard review", time: legacyTime, frequency: "daily" });
+  if (!migrated) return [];
+  const result = [migrated];
+  try {
+    localStorage.setItem(reminderStorageKey, JSON.stringify(result));
+    localStorage.removeItem(previousReminderStorageKey);
+    localStorage.removeItem(legacyReminderTimeKey);
+  } catch (_error) { /* leave old data in place when storage is unavailable */ }
+  return result;
+}
+
+function persistReminders(next) {
+  localStorage.setItem(reminderStorageKey, JSON.stringify(next));
+  reminders = next;
 }
 
 function compactLocalDateTime(date) {
@@ -123,70 +138,120 @@ function renderStatusBadges(labels) {
   });
 }
 
-function renderUpcoming(start, title, frequency, timezone) {
-  upcomingList.replaceChildren();
-  let occurrence = new Date(start);
-  for (let index = 0; index < 3; index += 1) {
-    const item = document.createElement("li");
-    const name = document.createElement("strong");
-    const date = document.createElement("span");
-    name.textContent = title;
-    date.textContent = new Intl.DateTimeFormat(undefined, {
-      weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-    }).format(occurrence);
-    item.append(name, date);
-    upcomingList.append(item);
-    occurrence = advanceOccurrence(occurrence, frequency);
-  }
-  el("upcoming-timezone").textContent = timezone;
-  upcomingPanel.classList.remove("hidden");
-}
-
-function updateReminder(persist = true) {
-  const title = reminderName.value.trim().slice(0, 80) || "Flashcard review";
-  const timeText = reminderTime.value;
-  const frequency = allowedFrequencies.has(reminderFrequency.value) ? reminderFrequency.value : "daily";
-  if (!timeText) {
-    if (persist) saveReminderConfig(title, "", frequency);
-    el("next-reminder").textContent = "No schedule yet. Choose a time when you're ready.";
-    el("public-reminder-icon").textContent = "✓";
-    el("public-reminder-heading").textContent = "You're all caught up.";
-    el("public-reminder-copy").textContent = "No reminders for today.";
-    renderStatusBadges(["Schedule clear"]);
-    upcomingPanel.classList.add("hidden");
-    calendarLink.removeAttribute("href");
-    calendarLink.classList.add("disabled");
-    calendarLink.setAttribute("aria-disabled", "true");
-    calendarLink.textContent = "Set a time to continue";
-    return;
-  }
-  if (persist) saveReminderConfig(title, timeText, frequency);
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const start = nextReminderDate(timeText, frequency, reminderWeekday);
+function calendarUrl(reminder, start, timezone) {
   const end = new Date(start.getTime() + 10 * 60 * 1000);
-  const display = new Intl.DateTimeFormat(undefined, {
-    weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-  }).format(start);
-  el("next-reminder").textContent = `Next: ${display} · ${frequencyLabel(frequency)}`;
-  const isToday = start.toDateString() === new Date().toDateString();
-  el("public-reminder-icon").textContent = isToday ? "◷" : "✓";
-  el("public-reminder-heading").textContent = isToday ? title : "You're all caught up.";
-  el("public-reminder-copy").textContent = isToday
-    ? `Scheduled today at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(start)}.`
-    : `No reminders for today. Next: ${title} · ${display}.`;
-  renderStatusBadges([frequencyLabel(frequency), timezone]);
-  renderUpcoming(start, title, frequency, timezone);
   const url = new URL("https://calendar.google.com/calendar/render");
   url.searchParams.set("action", "TEMPLATE");
-  url.searchParams.set("text", title);
-  url.searchParams.set("details", `Flashcard reminder created in Recall. Schedule: ${frequencyLabel(frequency)}. https://alishare21.github.io/flashcard-reminder/`);
+  url.searchParams.set("text", reminder.name);
+  url.searchParams.set("details", `Reminder created in Recall. Schedule: ${frequencyLabel(reminder.frequency)}. https://alishare21.github.io/flashcard-reminder/`);
   url.searchParams.set("dates", `${compactLocalDateTime(start)}/${compactLocalDateTime(end)}`);
-  url.searchParams.set("recur", recurrenceRule(frequency));
+  url.searchParams.set("recur", recurrenceRule(reminder.frequency));
   url.searchParams.set("ctz", timezone);
-  calendarLink.href = url.toString();
-  calendarLink.classList.remove("disabled");
-  calendarLink.setAttribute("aria-disabled", "false");
-  calendarLink.textContent = "Add to Google Calendar";
+  return url.toString();
+}
+
+function renderDraft() {
+  saveReminderButton.textContent = editingReminderId ? "Update reminder" : "Save reminder";
+  if (!validTime(reminderTime.value)) {
+    el("next-reminder").textContent = "Name an event, choose a time, and decide when it repeats.";
+    return;
+  }
+  const next = nextReminderDate(reminderTime.value, reminderFrequency.value, reminderWeekday);
+  el("next-reminder").textContent = `Next: ${new Intl.DateTimeFormat(undefined, {
+    weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  }).format(next)} · ${frequencyLabel(reminderFrequency.value)}`;
+}
+
+function resetReminderForm() {
+  editingReminderId = null;
+  reminderName.value = "";
+  reminderTime.value = "";
+  reminderFrequency.value = "daily";
+  reminderWeekday = new Date().getDay();
+  renderDraft();
+}
+
+function renderSavedReminders() {
+  const now = new Date();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const scheduled = reminders.map((reminder) => ({
+    reminder, start: nextReminderDate(reminder.time, reminder.frequency, reminder.weekday, now),
+  })).sort((a, b) => a.start - b.start || a.reminder.name.localeCompare(b.reminder.name));
+  const today = scheduled.filter(({ start }) => start.toDateString() === now.toDateString());
+  el("public-reminder-icon").textContent = today.length ? "◷" : "✓";
+  el("public-reminder-heading").textContent = today.length ? today[0].reminder.name : "You're all caught up.";
+  el("public-reminder-copy").textContent = today.length
+    ? `${today.length} reminder${today.length === 1 ? "" : "s"} left today. Next at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(today[0].start)}.`
+    : "No reminders for today.";
+  renderStatusBadges([`${reminders.length} saved`, timezone]);
+  upcomingList.replaceChildren();
+  scheduled.forEach(({ reminder, start }) => {
+    const item = document.createElement("li");
+    const name = document.createElement("strong");
+    name.textContent = reminder.name;
+    const date = document.createElement("span");
+    date.textContent = `${new Intl.DateTimeFormat(undefined, {
+      weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+    }).format(start)} · ${frequencyLabel(reminder.frequency)}`;
+    const actions = document.createElement("div");
+    actions.className = "saved-reminder-actions";
+    const calendar = document.createElement("a");
+    calendar.href = calendarUrl(reminder, start, timezone);
+    calendar.target = "_blank";
+    calendar.rel = "noopener";
+    calendar.textContent = "Add to Google Calendar";
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => {
+      editingReminderId = reminder.id;
+      reminderName.value = reminder.name;
+      reminderTime.value = reminder.time;
+      reminderFrequency.value = reminder.frequency;
+      reminderWeekday = reminder.weekday;
+      renderDraft();
+      reminderName.focus();
+    });
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", () => {
+      if (!window.confirm(`Remove "${reminder.name}" from this browser? This does not remove a Google Calendar event.`)) return;
+      try {
+        persistReminders(reminders.filter(({ id }) => id !== reminder.id));
+        if (editingReminderId === reminder.id) resetReminderForm();
+        el("reminder-feedback").textContent = "Reminder removed from this browser.";
+        renderSavedReminders();
+      } catch (_error) { el("reminder-feedback").textContent = "Could not save. Check browser storage settings."; }
+    });
+    actions.append(calendar, edit, remove);
+    item.append(name, date, actions);
+    upcomingList.append(item);
+  });
+  el("upcoming-timezone").textContent = timezone;
+  upcomingPanel.classList.toggle("hidden", !scheduled.length);
+}
+
+function saveReminder() {
+  if (!validTime(reminderTime.value)) {
+    el("reminder-feedback").textContent = "Choose a valid reminder time first.";
+    reminderTime.focus();
+    return;
+  }
+  const reminder = normalizeReminder({
+    id: editingReminderId || crypto.randomUUID(),
+    name: reminderName.value, time: reminderTime.value,
+    frequency: reminderFrequency.value, weekday: reminderWeekday,
+  });
+  const next = editingReminderId
+    ? reminders.map((existing) => existing.id === editingReminderId ? reminder : existing)
+    : [...reminders, reminder];
+  try {
+    persistReminders(next);
+    el("reminder-feedback").textContent = editingReminderId ? "Reminder updated in this browser." : "Reminder saved in this browser. Use Add to Google Calendar on its card to save it there too.";
+    resetReminderForm();
+    renderSavedReminders();
+  } catch (_error) { el("reminder-feedback").textContent = "Could not save. Check browser storage settings."; }
 }
 
 function showOnly(section) {
@@ -309,7 +374,7 @@ async function loadSession() {
     if (demoMode) {
       [loading, stage, complete, errorState].forEach((section) => section.classList.add("hidden"));
       publicReminderState.classList.remove("hidden");
-      updateReminder();
+      renderSavedReminders();
       return;
     }
     const query = state.deck ? `?deck=${encodeURIComponent(state.deck)}` : "";
@@ -352,14 +417,10 @@ el("refresh-button").addEventListener("click", () => {
   loadSession();
 });
 el("clear-reminder").addEventListener("click", () => {
-  reminderName.value = "Flashcard review";
-  reminderTime.value = "";
-  reminderFrequency.value = "daily";
-  reminderWeekday = new Date().getDay();
-  localStorage.removeItem(reminderStorageKey);
-  localStorage.removeItem(legacyReminderTimeKey);
-  updateReminder(false);
+  resetReminderForm();
+  el("reminder-feedback").textContent = "Form reset. Saved reminders are unchanged.";
 });
+saveReminderButton.addEventListener("click", saveReminder);
 el("retry-button").addEventListener("click", () => {
   if (window.location.protocol === "file:") {
     window.location.assign(localServerUrl);
@@ -391,18 +452,15 @@ if (demoMode) {
   el("progress-panel").classList.add("hidden");
   el("deck-picker").classList.add("hidden");
   reminderPanel.classList.remove("hidden");
-  const reminderConfig = loadReminderConfig();
-  reminderName.value = reminderConfig.name;
-  reminderTime.value = reminderConfig.time;
-  reminderFrequency.value = reminderConfig.frequency;
-  reminderWeekday = reminderConfig.weekday;
-  reminderName.addEventListener("input", () => updateReminder());
-  reminderTime.addEventListener("change", updateReminder);
+  reminders = loadReminders();
+  reminderName.addEventListener("input", renderDraft);
+  reminderTime.addEventListener("change", renderDraft);
   reminderFrequency.addEventListener("change", () => {
     if (reminderFrequency.value === "weekly") reminderWeekday = new Date().getDay();
-    updateReminder();
+    renderDraft();
   });
-  updateReminder();
+  renderDraft();
+  renderSavedReminders();
 }
 el("today-label").textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date());
 loadSession();

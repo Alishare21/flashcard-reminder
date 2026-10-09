@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor choose a reminder name, time, and daily, weekday, or weekly repeat rule. It previews the next three occurrences in the visitor's timezone. Separate buttons open a prefilled Google Calendar event and the visitor's Calendar for sign-in and checking saved events. The page does not read events back from Google. Settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
+The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor save multiple reminder cards with a name, time, and daily, weekday, or weekly repeat rule. Each card shows its next occurrence in the visitor's timezone and has actions to edit, remove, or open a prefilled Google Calendar event for review and saving. The separate Open Google Calendar button opens the visitor's calendar. These reminder cards live in that browser's storage and do not sync between devices. The page cannot read events or changes back from Google Calendar; edits there must also be made on the page. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 
@@ -53,7 +53,7 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Local automation | Windows Task Scheduler / PowerShell | Local fallback that runs without Codex |
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
 | Public deployment | GitHub Pages and GitHub Actions | Live responsive reminder dashboard with browser-only settings |
-| Calendar handoff | Google Calendar event template | Custom daily, weekday, or weekly reminder without calendar credentials |
+| Calendar handoff | Google Calendar event template | Per-card daily, weekday, or weekly event that the visitor reviews and saves without OAuth setup |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.
 
