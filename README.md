@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public demo:** [Open Recall Flashcards](https://alishare21.github.io/flashcard-reminder/)
 
-The public demo contains a safe Data Science and AI sample deck. It runs entirely in the browser and saves SM-2 review progress in browser storage. Personal notes, review history, email settings, and cloud credentials remain private.
+The public demo contains a safe Data Science and AI sample deck. It runs entirely in the browser, saves SM-2 review progress in browser storage, displays the next daily review time in each visitor's timezone, and can open a prefilled recurring Google Calendar event. Personal notes, review history, email settings, calendar data, and cloud credentials remain private.
 
 ## What the project does
 
@@ -53,6 +53,7 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Local automation | Windows Task Scheduler / PowerShell | Local fallback that runs without Codex |
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
 | Public deployment | GitHub Pages and GitHub Actions | Live browser demo with browser-only review state |
+| Calendar handoff | Google Calendar event template | Visitor-controlled recurring reminder without calendar credentials |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.
 

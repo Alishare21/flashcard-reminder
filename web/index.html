@@ -13,7 +13,7 @@
     <div class="ambient ambient-two" aria-hidden="true"></div>
     <main class="app-shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="Recall flashcards home">
+        <a class="brand" href="./" aria-label="Recall flashcards home">
           <span class="brand-mark" aria-hidden="true"><span>R</span></span>
           <span><strong>Recall</strong><small>spaced repetition</small></span>
         </a>
@@ -39,6 +39,23 @@
           <div><strong id="new-count">0</strong><span>new</span></div>
         </div>
         <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+      </section>
+
+      <section id="reminder-panel" class="reminder-panel hidden" aria-labelledby="reminder-title">
+        <div class="reminder-copy">
+          <span class="reminder-icon" aria-hidden="true">◷</span>
+          <div>
+            <p class="eyebrow">DAILY REMINDER</p>
+            <h2 id="reminder-title">Keep your review on schedule.</h2>
+            <p id="next-reminder">Choose a time for your next review.</p>
+          </div>
+        </div>
+        <div class="reminder-actions">
+          <label for="reminder-time">Review time</label>
+          <input id="reminder-time" type="time" value="08:00">
+          <a id="google-calendar-link" class="calendar-button" href="https://calendar.google.com/" target="_blank" rel="noopener">Add to Google Calendar</a>
+        </div>
+        <p class="calendar-note">Uses your browser timezone. Google Calendar opens a daily recurring event for you to review and save.</p>
       </section>
 
       <section id="loading-state" class="state-card" aria-live="polite">

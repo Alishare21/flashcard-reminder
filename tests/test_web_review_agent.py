@@ -74,7 +74,8 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "Make it stick." in html
     assert all(label in html for label in ("Again", "Hard", "Good", "Easy"))
     assert 'src="app.js"' in html and 'href="styles.css"' in html
-    assert "http://" not in html and "https://" not in html
+    assert 'src="http' not in html and '<link rel="stylesheet" href="http' not in html
+    assert 'href="https://calendar.google.com/"' in html
     assert 'addEventListener("keydown"' in script
     assert 'fetch("/api/review"' in script
     assert "document.createTextNode" in script and "document.createElement(\"strong\")" in script
@@ -85,6 +86,10 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert 'window.location.hostname.endsWith("github.io")' in script
     assert "recall-public-demo-v1" in script
     assert (WEB_ROOT / "demo-cards.json").exists()
+    assert "Add to Google Calendar" in html
+    assert "recall-reminder-time-v1" in script
+    assert 'url.searchParams.set("recur", "RRULE:FREQ=DAILY")' in script
+    assert "resolvedOptions().timeZone" in script
 
 
 def test_local_server_serves_interface_assets_and_due_session(tmp_path: Path, examples: dict) -> None:

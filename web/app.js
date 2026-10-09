@@ -4,6 +4,7 @@ const el = (id) => document.getElementById(id);
 const localServerUrl = "http://127.0.0.1:8765/";
 const demoMode = window.location.hostname.endsWith("github.io") || new URLSearchParams(window.location.search).has("demo");
 const demoStorageKey = "recall-public-demo-v1";
+const reminderStorageKey = "recall-reminder-time-v1";
 const state = {
   cards: [], reviewed: 0, initialTotal: 0, flipped: false, busy: false,
   deck: "", today: "", demoCatalog: [],
@@ -21,6 +22,9 @@ const errorState = el("error-state");
 const flashcard = el("flashcard");
 const gradeButtons = [...document.querySelectorAll(".grade")];
 const deckSelect = el("deck-select");
+const reminderPanel = el("reminder-panel");
+const reminderTime = el("reminder-time");
+const calendarLink = el("google-calendar-link");
 
 function localDate() {
   const date = new Date();
@@ -34,6 +38,39 @@ function addDays(dateText, days) {
   const date = new Date(`${dateText}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);
+}
+
+function nextReminderDate(timeText) {
+  const [hours, minutes] = timeText.split(":").map(Number);
+  const next = new Date();
+  next.setHours(hours, minutes, 0, 0);
+  if (next <= new Date()) next.setDate(next.getDate() + 1);
+  return next;
+}
+
+function compactLocalDateTime(date) {
+  const part = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}${part(date.getMonth() + 1)}${part(date.getDate())}T${part(date.getHours())}${part(date.getMinutes())}00`;
+}
+
+function updateReminder() {
+  const timeText = reminderTime.value || "08:00";
+  localStorage.setItem(reminderStorageKey, timeText);
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const start = nextReminderDate(timeText);
+  const end = new Date(start.getTime() + 10 * 60 * 1000);
+  const display = new Intl.DateTimeFormat(undefined, {
+    weekday: "long", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  }).format(start);
+  el("next-reminder").textContent = `Next review: ${display} · ${timezone}`;
+  const url = new URL("https://calendar.google.com/calendar/render");
+  url.searchParams.set("action", "TEMPLATE");
+  url.searchParams.set("text", "Review flashcards");
+  url.searchParams.set("details", "Review the flashcards due today in Recall: https://alishare21.github.io/flashcard-reminder/");
+  url.searchParams.set("dates", `${compactLocalDateTime(start)}/${compactLocalDateTime(end)}`);
+  url.searchParams.set("recur", "RRULE:FREQ=DAILY");
+  url.searchParams.set("ctz", timezone);
+  calendarLink.href = url.toString();
 }
 
 function showOnly(section) {
@@ -291,6 +328,10 @@ document.addEventListener("keydown", (event) => {
 if (demoMode) {
   el("runtime-note").textContent = "Public demo · progress stays in this browser";
   el("refresh-button").textContent = "Reset demo";
+  reminderPanel.classList.remove("hidden");
+  reminderTime.value = localStorage.getItem(reminderStorageKey) || "08:00";
+  reminderTime.addEventListener("change", updateReminder);
+  updateReminder();
 }
 el("today-label").textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date());
 loadSession();

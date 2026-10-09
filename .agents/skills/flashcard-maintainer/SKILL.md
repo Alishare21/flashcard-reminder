@@ -16,7 +16,7 @@ Work from the project root. Read `AGENTS.md`, the affected module, and its tests
 - `remind` is dry-run unless `--send` is explicit. Successful sends are recorded once per date. Keep SMTP secrets in `.env`; never print or log secrets or card text. Preview at most three fronts only when `show_card_preview` is enabled.
 - Pass a fixed `today` into tested functions. The CLI computes it using the timezone in `config.yaml`.
 - The `web` command binds only to `127.0.0.1` and uses the same due selection and transactional review save as the terminal session. Keep browser assets dependency-free, card text local, keyboard accessible, and usable on desktop and mobile. Do not add card text to HTTP request logs.
-- The public portfolio demo is deployed from `web/` to GitHub Pages by `.github/workflows/pages.yml`. On `*.github.io`, it loads only the bundled `web/demo-cards.json` sample deck and stores SM-2 progress in the visitor's browser. Never expose personal notes, SQLite data, Supabase access, SMTP settings, or the private review API through this deployment.
+- The public portfolio demo is deployed from `web/` to GitHub Pages by `.github/workflows/pages.yml`. On `*.github.io`, it loads only the bundled `web/demo-cards.json` sample deck and stores SM-2 progress and reminder time in the visitor's browser. Its Google Calendar link may prefill a recurring event, but must never read or modify a calendar without the visitor reviewing and saving the event. Never expose personal notes, SQLite data, Supabase access, SMTP settings, calendar credentials, or the private review API through this deployment.
 
 ## Automation and verification
 
