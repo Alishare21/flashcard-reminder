@@ -2,7 +2,12 @@
 
 const el = (id) => document.getElementById(id);
 const localServerUrl = "http://127.0.0.1:8765/";
-const state = { cards: [], reviewed: 0, initialTotal: 0, flipped: false, busy: false, deck: "", today: "" };
+const demoMode = window.location.hostname.endsWith("github.io") || new URLSearchParams(window.location.search).has("demo");
+const demoStorageKey = "recall-public-demo-v1";
+const state = {
+  cards: [], reviewed: 0, initialTotal: 0, flipped: false, busy: false,
+  deck: "", today: "", demoCatalog: [],
+};
 const typeLabels = {
   qa: { front: "QUESTION", back: "ANSWER", kind: "Question & answer" },
   term: { front: "TERM", back: "DEFINITION", kind: "Term & definition" },
@@ -16,6 +21,20 @@ const errorState = el("error-state");
 const flashcard = el("flashcard");
 const gradeButtons = [...document.querySelectorAll(".grade")];
 const deckSelect = el("deck-select");
+
+function localDate() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(dateText, days) {
+  const date = new Date(`${dateText}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
 
 function showOnly(section) {
   [loading, stage, complete, errorState].forEach((item) => item.classList.toggle("hidden", item !== section));
@@ -124,6 +143,70 @@ function reveal() {
   setGrades(true);
 }
 
+function loadDemoProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(demoStorageKey) || "{}");
+  } catch (_error) {
+    return {};
+  }
+}
+
+function demoSession() {
+  const today = localDate();
+  const progress = loadDemoProgress();
+  const cards = state.demoCatalog
+    .filter((card) => !state.deck || card.deck === state.deck)
+    .map((card) => {
+      const saved = progress[card.id];
+      return { ...card, due_date: saved?.due_date || today, is_new: !saved };
+    })
+    .filter((card) => card.due_date <= today)
+    .sort((left, right) => {
+      if (left.is_new !== right.is_new) return left.is_new ? 1 : -1;
+      return left.due_date.localeCompare(right.due_date);
+    });
+  const deckCounts = new Map();
+  cards.forEach((card) => deckCounts.set(card.deck, (deckCounts.get(card.deck) || 0) + 1));
+  return {
+    cards,
+    total: cards.length,
+    today,
+    new_count: cards.filter((card) => card.is_new).length,
+    review_count: cards.filter((card) => !card.is_new).length,
+    decks: [...deckCounts.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([name, count]) => ({ name, count })),
+  };
+}
+
+function nextDemoState(previous, grade) {
+  const quality = { 1: 1, 2: 3, 3: 4, 4: 5 }[grade];
+  let ease = previous?.ease ?? 2.5;
+  let intervalDays = previous?.interval_days ?? 0;
+  let repetitions = previous?.repetitions ?? 0;
+  if (quality < 3) {
+    repetitions = 0;
+    intervalDays = 1;
+  } else {
+    repetitions += 1;
+    if (repetitions === 1) intervalDays = 1;
+    else if (repetitions === 2) intervalDays = 6;
+    else intervalDays = Math.floor(intervalDays * ease + 0.5);
+    ease = Math.max(1.3, Math.round((ease + 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)) * 100) / 100);
+  }
+  intervalDays = Math.min(intervalDays, 365);
+  return { ease, interval_days: intervalDays, repetitions, due_date: addDays(localDate(), intervalDays) };
+}
+
+async function loadDemoSession() {
+  if (!state.demoCatalog.length) {
+    const response = await fetch("demo-cards.json", { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("Could not load the public demo cards");
+    state.demoCatalog = await response.json();
+  }
+  applySession(demoSession(), true);
+}
+
 async function loadSession() {
   if (window.location.protocol === "file:") {
     el("error-copy").textContent =
@@ -134,6 +217,10 @@ async function loadSession() {
   }
   showOnly(loading);
   try {
+    if (demoMode) {
+      await loadDemoSession();
+      return;
+    }
     const query = state.deck ? `?deck=${encodeURIComponent(state.deck)}` : "";
     const response = await fetch(`/api/session${query}`, { headers: { Accept: "application/json" } });
     const data = await response.json();
@@ -151,6 +238,15 @@ async function gradeCard(grade) {
   setGrades(false);
   el("status-line").textContent = "Saving review…";
   try {
+    if (demoMode) {
+      const card = state.cards[0];
+      const progress = loadDemoProgress();
+      progress[card.id] = nextDemoState(progress[card.id], grade);
+      localStorage.setItem(demoStorageKey, JSON.stringify(progress));
+      state.reviewed += 1;
+      applySession(demoSession());
+      return;
+    }
     const response = await fetch("/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -170,7 +266,10 @@ async function gradeCard(grade) {
 flashcard.addEventListener("click", reveal);
 gradeButtons.forEach((button) => button.addEventListener("click", () => gradeCard(Number(button.dataset.grade))));
 deckSelect.addEventListener("change", () => { state.deck = deckSelect.value; loadSession(); });
-el("refresh-button").addEventListener("click", loadSession);
+el("refresh-button").addEventListener("click", () => {
+  if (demoMode) localStorage.removeItem(demoStorageKey);
+  loadSession();
+});
 el("retry-button").addEventListener("click", () => {
   if (window.location.protocol === "file:") {
     window.location.assign(localServerUrl);
@@ -189,5 +288,9 @@ document.addEventListener("keydown", (event) => {
   if (state.flipped && ["1", "2", "3", "4"].includes(event.key)) gradeCard(Number(event.key));
 });
 
+if (demoMode) {
+  el("runtime-note").textContent = "Public demo · progress stays in this browser";
+  el("refresh-button").textContent = "Reset demo";
+}
 el("today-label").textContent = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date());
 loadSession();

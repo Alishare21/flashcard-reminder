@@ -1,0 +1,58 @@
+[
+  {
+    "id": "demo-python-list",
+    "deck": "Python fundamentals",
+    "type": "qa",
+    "front": "What is the difference between a Python list and a tuple?",
+    "back": "A list is mutable and uses square brackets. A tuple is immutable and uses parentheses."
+  },
+  {
+    "id": "demo-cross-validation",
+    "deck": "Data science",
+    "type": "term",
+    "front": "cross-validation",
+    "back": "A resampling method that estimates how well a model generalizes by training and evaluating it on different data subsets."
+  },
+  {
+    "id": "demo-overfitting",
+    "deck": "Machine learning",
+    "type": "qa",
+    "front": "What is overfitting?",
+    "back": "Overfitting happens when a model learns training-data noise and performs well on training examples but poorly on unseen data."
+  },
+  {
+    "id": "demo-gradient-descent",
+    "deck": "Deep learning",
+    "type": "cloze",
+    "front": "Gradient descent updates weights in the direction of [...].",
+    "back": "Gradient descent updates weights in the direction of **the negative loss gradient**."
+  },
+  {
+    "id": "demo-relu",
+    "deck": "Deep learning",
+    "type": "qa",
+    "front": "What output does ReLU produce for an input x?",
+    "back": "ReLU(x) = max(0, x). It returns zero for negative inputs and x for positive inputs."
+  },
+  {
+    "id": "demo-precision-recall",
+    "deck": "Data science",
+    "type": "qa",
+    "front": "When is recall more important than precision?",
+    "back": "Recall is more important when missing a true positive is especially costly, such as failing to detect a serious disease."
+  },
+  {
+    "id": "demo-embedding",
+    "deck": "Artificial intelligence",
+    "type": "term",
+    "front": "embedding",
+    "back": "A dense numeric vector that represents an item so semantically similar items are positioned near one another."
+  },
+  {
+    "id": "demo-sm2",
+    "deck": "Spaced repetition",
+    "type": "qa",
+    "front": "What does a spaced-repetition scheduler change after each review?",
+    "back": "It updates the card's next review interval using the learner's recall grade, showing difficult cards sooner and familiar cards later."
+  }
+]

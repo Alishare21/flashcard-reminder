@@ -82,6 +82,9 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert 'window.location.protocol === "file:"' in script
     assert "python src/main.py web" in script
     assert 'window.location.assign(localServerUrl)' in script
+    assert 'window.location.hostname.endsWith("github.io")' in script
+    assert "recall-public-demo-v1" in script
+    assert (WEB_ROOT / "demo-cards.json").exists()
 
 
 def test_local_server_serves_interface_assets_and_due_session(tmp_path: Path, examples: dict) -> None:

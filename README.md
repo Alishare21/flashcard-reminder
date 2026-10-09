@@ -2,6 +2,10 @@
 
 A local-first flashcard application that converts Markdown notes into visual study cards, schedules reviews with the deterministic SM-2 spaced-repetition algorithm, supports browser and terminal review sessions, and sends daily email reminders. Review history stays in SQLite and is mirrored to a private Supabase database so Trigger.dev can run the reminder every day without Codex or the local computer.
 
+**Live public demo:** [Open Recall Flashcards](https://alishare21.github.io/flashcard-reminder/)
+
+The public demo contains a safe Data Science and AI sample deck. It runs entirely in the browser and saves SM-2 review progress in browser storage. Personal notes, review history, email settings, and cloud credentials remain private.
+
 ## What the project does
 
 1. Recursively reads Markdown files from `notes/` without modifying them.
@@ -48,6 +52,7 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Email | Gmail SMTP with STARTTLS | Daily cards-due messages |
 | Local automation | Windows Task Scheduler / PowerShell | Local fallback that runs without Codex |
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
+| Public deployment | GitHub Pages and GitHub Actions | Live browser demo with browser-only review state |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.
 
@@ -97,7 +102,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SECRET_KEY=your-private-server-key
 ```
 
-Never commit `.env`, local notes, database files, logs, or OAuth credentials. The public repository `.gitignore` excludes them. The review website still runs only on your computer because it can display card text and update review history.
+Never commit `.env`, local notes, database files, logs, or OAuth credentials. The public repository `.gitignore` excludes them. The private review mode still runs only on your computer because it displays personal card text and updates your real review history; the public demo uses only its bundled sample deck.
 
 ## Daily commands
 
