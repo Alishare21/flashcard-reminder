@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
     <title>Recall — Flashcard Reminder</title>
-    <link rel="stylesheet" href="styles.css?v=20261009-3">
-    <script src="app.js?v=20261009-3" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261009-4">
+    <script src="app.js?v=20261009-4" defer></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -80,9 +80,10 @@
             </select>
           </label>
           <a id="google-calendar-link" class="calendar-button disabled" target="_blank" rel="noopener" aria-disabled="true">Set a time to continue</a>
+          <a id="open-google-calendar" class="calendar-open-button" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Open Google Calendar</a>
           <button id="clear-reminder" class="clear-reminder" type="button">Clear</button>
         </div>
-        <p class="calendar-note">Settings save automatically in this browser. Google handles sign-in and asks you to review the recurring event before saving it. This site never receives your login or calendar data.</p>
+        <p class="calendar-note">Settings save in this browser. Add to Google Calendar opens a prefilled event for you to review and save. Open Google Calendar lets you sign in and check your saved events; this page does not import them.</p>
       </section>
 
       <section id="upcoming-panel" class="upcoming-panel hidden" aria-labelledby="upcoming-title">

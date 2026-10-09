@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor choose a reminder name, time, and daily, weekday, or weekly repeat rule. It previews the next three occurrences in the visitor's timezone and can open a prefilled Google Calendar event through Google's own sign-in page. Settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
+The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor choose a reminder name, time, and daily, weekday, or weekly repeat rule. It previews the next three occurrences in the visitor's timezone. Separate buttons open a prefilled Google Calendar event and the visitor's Calendar for sign-in and checking saved events. The page does not read events back from Google. Settings stay in the visitor's browser. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 

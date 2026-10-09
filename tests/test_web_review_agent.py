@@ -91,7 +91,9 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "public-reminder-state" in html
     assert "demo-cards.json" not in script
     assert 'calendarLink.textContent = "Add to Google Calendar"' in script
-    assert "Google handles sign-in" in html
+    assert 'id="open-google-calendar"' in html
+    assert 'href="https://calendar.google.com/calendar/u/0/r"' in html
+    assert "this page does not import them" in html
     assert "recall-reminder-config-v2" in script
     assert 'url.searchParams.set("recur", recurrenceRule(frequency))' in script
     assert "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" in script
