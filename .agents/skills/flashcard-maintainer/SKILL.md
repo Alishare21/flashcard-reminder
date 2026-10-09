@@ -16,6 +16,7 @@ Work from the project root. Read `AGENTS.md`, the affected module, and its tests
 - `remind` is dry-run unless `--send` is explicit. Successful sends are recorded once per date. Keep SMTP secrets in `.env`; never print or log secrets or card text. Preview at most three fronts only when `show_card_preview` is enabled.
 - Pass a fixed `today` into tested functions. The CLI computes it using the timezone in `config.yaml`.
 - The `web` command binds only to `127.0.0.1` and uses the same due selection and transactional review save as the terminal session. Keep browser assets dependency-free, card text local, keyboard accessible, and usable on desktop and mobile. Do not add card text to HTTP request logs.
+- The public portfolio demo is deployed from `web/` to GitHub Pages by `.github/workflows/pages.yml`. On `*.github.io`, it loads only the bundled `web/demo-cards.json` sample deck and stores SM-2 progress in the visitor's browser. Never expose personal notes, SQLite data, Supabase access, SMTP settings, or the private review API through this deployment.
 
 ## Automation and verification
 
@@ -34,3 +35,5 @@ Trigger.dev Production version `20261008.5` was deployed on 2026-10-08 with a ze
 Before switching off the Windows task, verify in order: local full tests, TypeScript typecheck, live count-only Supabase check, local cloud reminder with zero cards, Trigger Production deployment, manual Trigger run, one real due-card email, once-per-day behavior, and a second local mirror that leaves cloud counts stable. Keep card text out of Trigger outputs and logs.
 
 Run focused tests for changed code and `python -m pytest -q --basetemp .pytest_tmp` before reporting. If Trigger files change, also run `npm run typecheck` and the Development preview; verify its run output in Trigger.dev. Update `README.md` when setup or automation changes.
+
+For public demo changes, run `node --check web/app.js`, validate `web/demo-cards.json`, run the full Python suite, and verify the deployed URL in a fresh browser. The live demo URL is `https://alishare21.github.io/flashcard-reminder/`; GitHub Actions must finish successfully before reporting deployment.
