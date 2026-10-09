@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#111827">
     <title>Recall — Flashcard Reminder</title>
-    <link rel="stylesheet" href="styles.css?v=20261009-5">
-    <script src="app.js?v=20261009-5" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261009-6">
+    <script type="module" src="app.js?v=20261009-6"></script>
   </head>
   <body>
     <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -84,7 +84,21 @@
           <button id="clear-reminder" class="clear-reminder" type="button">Reset form</button>
         </div>
         <p id="reminder-feedback" class="reminder-feedback" role="status" aria-live="polite"></p>
-        <p class="calendar-note">Your reminder cards are saved in this browser. Each card can open a prefilled Google Calendar event for you to review and save. Changes made later in Google Calendar must also be made here.</p>
+        <p class="calendar-note">Your reminder cards are saved in this browser. Each card can open a prefilled Google Calendar event for you to review and save. Changes made later in Google Calendar must also be made here unless you connect Google below and sync again.</p>
+      </section>
+
+      <section id="google-sync-panel" class="google-sync-panel hidden" aria-labelledby="google-sync-title">
+        <div>
+          <p class="eyebrow">GOOGLE SYNC</p>
+          <h2 id="google-sync-title">Your calendar and tasks</h2>
+          <p id="google-sync-status" role="status" aria-live="polite">Connect Google to show your events and tasks privately in this browser.</p>
+        </div>
+        <div class="google-sync-actions">
+          <button id="google-connect" class="calendar-button" type="button">Connect Google</button>
+          <button id="google-refresh" class="calendar-open-button" type="button" disabled>Sync now</button>
+          <button id="google-disconnect" class="clear-reminder" type="button" disabled>Disconnect</button>
+        </div>
+        <p class="calendar-note">Recall requests read-only Calendar and Tasks access. Google items stay in this browser session and are never published with the site. Sync now refreshes changes from Google; this page cannot edit Google items.</p>
       </section>
 
       <section id="upcoming-panel" class="upcoming-panel hidden" aria-labelledby="upcoming-title">

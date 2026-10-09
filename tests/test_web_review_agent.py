@@ -90,7 +90,9 @@ def test_visual_interface_has_flip_controls_and_no_external_assets() -> None:
     assert "empty-reminder-card" in html
     assert "public-reminder-state" in html
     assert "demo-cards.json" not in script
-    assert 'calendar.textContent = "Add to Google Calendar"' in script
+    assert '"Add to Google Calendar"' in script
+    assert 'id="google-connect"' in html
+    assert 'import { createGoogleConnector } from "./google-sync.js"' in script
     assert 'id="open-google-calendar"' in html
     assert 'href="https://calendar.google.com/calendar/u/0/r"' in html
     assert "Changes made later in Google Calendar must also be made here" in html
@@ -124,6 +126,10 @@ def test_local_server_serves_interface_assets_and_due_session(tmp_path: Path, ex
         with urlopen(f"{base}/app.js") as response:
             assert response.status == 200
             assert response.headers.get_content_type() == "text/javascript"
+        for asset in ("google-sync.js", "google-config.js"):
+            with urlopen(f"{base}/{asset}") as response:
+                assert response.status == 200
+                assert response.headers.get_content_type() == "text/javascript"
         with urlopen(f"{base}/api/session") as response:
             session = json.load(response)
         assert session["total"] == 7

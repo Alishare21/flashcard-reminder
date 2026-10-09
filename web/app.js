@@ -1,3 +1,5 @@
+import { createGoogleConnector } from "./google-sync.js";
+
 "use strict";
 
 const el = (id) => document.getElementById(id);
@@ -35,6 +37,7 @@ const upcomingList = el("upcoming-list");
 let reminderWeekday = new Date().getDay();
 let reminders = [];
 let editingReminderId = null;
+let googleItems = [];
 
 function localDate() {
   const date = new Date();
@@ -174,32 +177,52 @@ function resetReminderForm() {
 function renderSavedReminders() {
   const now = new Date();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const scheduled = reminders.map((reminder) => ({
-    reminder, start: nextReminderDate(reminder.time, reminder.frequency, reminder.weekday, now),
-  })).sort((a, b) => a.start - b.start || a.reminder.name.localeCompare(b.reminder.name));
-  const today = scheduled.filter(({ start }) => start.toDateString() === now.toDateString());
+  const scheduled = [
+    ...reminders.map((reminder) => ({
+      kind: "local", reminder, start: nextReminderDate(reminder.time, reminder.frequency, reminder.weekday, now),
+    })),
+    ...googleItems.map((reminder) => ({ kind: "google", reminder, start: reminder.start })),
+  ].sort((a, b) => (a.start?.getTime() ?? Infinity) - (b.start?.getTime() ?? Infinity)
+    || a.reminder.name.localeCompare(b.reminder.name));
+  const today = scheduled.filter(({ kind, reminder, start }) => start && (
+    kind === "google" && reminder.kind === "task"
+      ? start.toDateString() === now.toDateString() || start < now
+      : start.toDateString() === now.toDateString()
+  ));
   el("public-reminder-icon").textContent = today.length ? "◷" : "✓";
   el("public-reminder-heading").textContent = today.length ? today[0].reminder.name : "You're all caught up.";
   el("public-reminder-copy").textContent = today.length
-    ? `${today.length} reminder${today.length === 1 ? "" : "s"} left today. Next at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(today[0].start)}.`
+    ? `${today.length} item${today.length === 1 ? "" : "s"} due today${today[0].reminder.allDay ? "." : `. Next at ${new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(today[0].start)}.`}`
     : "No reminders for today.";
-  renderStatusBadges([`${reminders.length} saved`, timezone]);
+  renderStatusBadges([`${reminders.length} saved`, `${googleItems.length} Google`, timezone]);
   upcomingList.replaceChildren();
-  scheduled.forEach(({ reminder, start }) => {
+  scheduled.forEach(({ kind, reminder, start }) => {
     const item = document.createElement("li");
     const name = document.createElement("strong");
     name.textContent = reminder.name;
     const date = document.createElement("span");
-    date.textContent = `${new Intl.DateTimeFormat(undefined, {
+    date.textContent = kind === "google"
+      ? `${reminder.kind === "task" ? "Task" : "Event"} · ${reminder.source} · ${start
+        ? new Intl.DateTimeFormat(undefined, reminder.allDay
+          ? { weekday: "short", month: "short", day: "numeric" }
+          : { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(start)
+        : "No due date"}`
+      : `${new Intl.DateTimeFormat(undefined, {
       weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
     }).format(start)} · ${frequencyLabel(reminder.frequency)}`;
     const actions = document.createElement("div");
     actions.className = "saved-reminder-actions";
     const calendar = document.createElement("a");
-    calendar.href = calendarUrl(reminder, start, timezone);
+    calendar.href = kind === "google" ? reminder.url : calendarUrl(reminder, start, timezone);
     calendar.target = "_blank";
     calendar.rel = "noopener";
-    calendar.textContent = "Add to Google Calendar";
+    calendar.textContent = kind === "google" ? "Open in Google" : "Add to Google Calendar";
+    if (kind === "google") {
+      actions.append(calendar);
+      item.append(name, date, actions);
+      upcomingList.append(item);
+      return;
+    }
     const edit = document.createElement("button");
     edit.type = "button";
     edit.textContent = "Edit";
@@ -452,6 +475,23 @@ if (demoMode) {
   el("progress-panel").classList.add("hidden");
   el("deck-picker").classList.add("hidden");
   reminderPanel.classList.remove("hidden");
+  el("google-sync-panel").classList.remove("hidden");
+  let googleConnector;
+  googleConnector = createGoogleConnector(
+    (items) => { googleItems = items; renderSavedReminders(); },
+    (message) => {
+      el("google-sync-status").textContent = message;
+      el("google-refresh").disabled = !googleConnector.connected();
+      el("google-disconnect").disabled = !googleConnector.connected();
+    },
+  );
+  if (!googleConnector.configured) {
+    el("google-connect").disabled = true;
+    el("google-sync-status").textContent = "Google connection is awaiting its Web OAuth client setup.";
+  }
+  el("google-connect").addEventListener("click", googleConnector.connect);
+  el("google-refresh").addEventListener("click", googleConnector.refresh);
+  el("google-disconnect").addEventListener("click", googleConnector.disconnect);
   reminders = loadReminders();
   reminderName.addEventListener("input", renderDraft);
   reminderTime.addEventListener("change", renderDraft);

@@ -4,7 +4,7 @@ A local-first flashcard application that converts Markdown notes into visual stu
 
 **Live public reminder dashboard:** [Open Recall Reminders](https://alishare21.github.io/flashcard-reminder/)
 
-The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor save multiple reminder cards with a name, time, and daily, weekday, or weekly repeat rule. Each card shows its next occurrence in the visitor's timezone and has actions to edit, remove, or open a prefilled Google Calendar event for review and saving. The separate Open Google Calendar button opens the visitor's calendar. These reminder cards live in that browser's storage and do not sync between devices. The page cannot read events or changes back from Google Calendar; edits there must also be made on the page. Personal notes, flashcard text, review history, email settings, calendar data, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
+The public page displays reminder status in a flashcard, shows “You're all caught up” when appropriate, and lets each visitor save multiple reminder cards with a name, time, and daily, weekday, or weekly repeat rule. Each card shows its next occurrence in the visitor's timezone and has actions to edit, remove, or open a prefilled Google Calendar event for review and saving. The separate Open Google Calendar button opens the visitor's calendar. These reminder cards live in that browser's storage and do not sync between devices. The separate Connect Google flow loads events and open tasks into the page after the visitor grants read-only access; Sync now refreshes them. Personal notes, flashcard text, review history, email settings, Google tokens, and cloud credentials remain private. The full flashcard reviewer continues to run locally.
 
 ## What the project does
 
@@ -54,8 +54,13 @@ NotesReaderAgent -> CardGeneratorAgent -> SQLite data/cards.db
 | Source control | Git and GitHub | Public portfolio repository for review and version history |
 | Public deployment | GitHub Pages and GitHub Actions | Live responsive reminder dashboard with browser-only settings |
 | Calendar handoff | Google Calendar event template | Per-card daily, weekday, or weekly event that the visitor reviews and saves without OAuth setup |
+| Optional Google sync | Google Identity Services, Calendar API, Tasks API | Read-only visitor connection with an in-memory access token |
 
 No AI model is used to generate cards. Parsing and scheduling are local and deterministic.
+
+## Optional Google connection
+
+To enable Connect Google on the public page, create a **Web application** OAuth client in Google Cloud, allow the JavaScript origin `https://alishare21.github.io`, enable the Google Calendar and Google Tasks APIs, and place the public client ID in `web/google-config.js`. Configure the OAuth consent screen and its test users or publication status in Google Cloud. The three read-only scopes are `calendar.events.readonly`, `calendar.calendarlist.readonly`, and `tasks.readonly`. Each visitor chooses Connect Google and approves access in Google's consent screen. Google items are fetched directly by that visitor's browser, remain in page memory, and disappear on reload or Disconnect; connect again after a reload. The site does not send Google items or tokens to Supabase or Trigger.dev. A public OAuth app with these scopes may require Google verification before people outside the project's test users can connect.
 
 ## Supported note formats
 

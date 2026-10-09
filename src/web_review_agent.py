@@ -22,6 +22,8 @@ STATIC_FILES = {
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/google-sync.js": ("google-sync.js", "text/javascript; charset=utf-8"),
+    "/google-config.js": ("google-config.js", "text/javascript; charset=utf-8"),
 }
 
 
@@ -112,7 +114,7 @@ def _handler_class(
             self.send_header("X-Frame-Options", "DENY")
             self.send_header(
                 "Content-Security-Policy",
-                "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'",
+                "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self' https://accounts.google.com; connect-src 'self' https://www.googleapis.com https://tasks.googleapis.com; frame-src https://accounts.google.com; frame-ancestors 'none'",
             )
             self.end_headers()
 

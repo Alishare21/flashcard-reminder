@@ -173,6 +173,13 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .calendar-note { margin: -8px 0 0 56px; color: #758197; font-size: .68rem; line-height: 1.5; }
 .reminder-feedback { min-height: 1.2em; margin: 4px 0 12px 56px; color: var(--success); font-size: .76rem; }
 
+.google-sync-panel { margin: 0 0 22px; padding: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border: 1px solid var(--line); border-radius: 20px; background: rgba(15, 22, 36, .56); }
+.google-sync-panel h2 { margin: 0; font-size: 1rem; }
+.google-sync-panel p:not(.eyebrow):not(.calendar-note) { margin: 6px 0 0; color: var(--muted); font-size: .76rem; }
+.google-sync-panel .calendar-note { width: 100%; margin: 0; }
+.google-sync-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.google-sync-actions button:disabled { opacity: .42; cursor: not-allowed; }
+
 .upcoming-panel { margin: 0 0 30px; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: rgba(15, 22, 36, .56); }
 .upcoming-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
 .upcoming-heading .eyebrow { margin-bottom: 5px; }
@@ -302,6 +309,8 @@ footer { margin-top: auto; padding-top: 30px; gap: 10px; color: #6f7a8e; font-si
   .reminder-name-field { grid-column: 1 / -1; }
   .calendar-button, .calendar-open-button { grid-column: 1 / -1; text-align: center; }
   .calendar-note, .reminder-feedback { margin-left: 0; }
+  .google-sync-actions { width: 100%; }
+  .google-sync-actions button { flex: 1 1 130px; }
   .upcoming-panel { padding: 16px; }
   .upcoming-heading { align-items: flex-start; flex-direction: column; }
   .upcoming-list { grid-template-columns: 1fr; }
